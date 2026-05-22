@@ -53,6 +53,7 @@
         tg.expand();
         const cmdInput = document.getElementById('cmdInput');
         const terminal = document.getElementById('terminal');
+        
         function addMessage(text, type) {
             const msg = document.createElement('div');
             msg.className = 'msg ' + type;
@@ -60,16 +61,24 @@
             terminal.appendChild(msg);
             terminal.scrollTop = terminal.scrollHeight;
         }
+        
         function sendCommand() {
             const cmd = cmdInput.value.trim();
             if (!cmd) return;
             addMessage(cmd, 'user');
             tg.sendData(cmd);
             cmdInput.value = '';
-            setTimeout(() => addMessage('✅ Отправлено!', 'bot'), 300);
         }
-        function quickCmd(cmd) { cmdInput.value = cmd; sendCommand(); }
-        cmdInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') sendCommand(); });
+        
+        function quickCmd(cmd) {
+            cmdInput.value = cmd;
+            sendCommand();
+        }
+        
+        cmdInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendCommand();
+        });
+        
         tg.MainButton.setText('Закрыть').show();
         tg.MainButton.onClick(() => tg.close());
     </script>
