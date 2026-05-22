@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Няшный Бот</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            padding: 10px;
+        }
+        .header {
+            text-align: center;
+            padding: 15px 0;
+            font-size: 22px;
+        }
+        .terminal {
+            background: #0d0d1a;
+            border-radius: 10px;
+            padding: 15px;
+            height: 60vh;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .terminal .msg { margin: 5px 0; padding: 8px; border-radius: 8px; }
+        .terminal .user { background: #16213e; color: #0f9; text-align: right; }
+        .terminal .bot { background: #0f3460; color: #fff; }
+        .input-area {
+            display: flex;
+            gap: 5px;
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+        }
+        .input-area input {
+            flex: 1;
+            padding: 14px;
+            border-radius: 25px;
+            border: none;
+            background: #16213e;
+            color: #fff;
+            font-size: 16px;
+        }
+        .input-area button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: #e94560;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .quick-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 70px;
+        }
+        .quick-btns button {
+            padding: 10px 14px;
+            border-radius: 20px;
+            border: none;
+            background: #16213e;
+            color: #0f9;
+            font-size: 13px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">🚀 Няшный Бот</div>
+
+    <div class="terminal" id="terminal">
+        <div class="msg bot">🤖 Привет! Это MiniApp</div>
+        <div class="msg bot">💡 Команды:</div>
+        <div class="msg bot">• мяу — баллы</div>
+        <div class="msg bot">• баланс — счёт</div>
+        <div class="msg bot">• ракета 100 — игра</div>
+    </div>
+
+    <div class="quick-btns">
+        <button onclick="quickCmd('мяу')">🐾 мяу</button>
+        <button onclick="quickCmd('баланс')">💗 баланс</button>
+        <button onclick="quickCmd('ракета 100')">🚀 ракета</button>
+        <button onclick="quickCmd('рул кра 50')">🎡 рул</button>
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="cmdInput" placeholder="Команда..." autofocus>
+        <button onclick="sendCommand()">▶</button>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        const cmdInput = document.getElementById('cmdInput');
+        const terminal = document.getElementById('terminal');
+
+        function addMessage(text, type) {
+            const msg = document.createElement('div');
+            msg.className = 'msg ' + type;
+            msg.textContent = (type === 'user' ? '👤 ' : '🤖 ') + text;
+            terminal.appendChild(msg);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function sendCommand() {
+            const cmd = cmdInput.value.trim();
+            if (!cmd) return;
+            addMessage(cmd, 'user');
+            tg.sendData(cmd);
+            cmdInput.value = '';
+            setTimeout(() => addMessage('✅ Отправлено!', 'bot'), 300);
+        }
+
+        function quickCmd(cmd) {
+            cmdInput.value = cmd;
+            sendCommand();
+        }
+
+        cmdInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendCommand();
+        });
+
+        tg.MainButton.setText('Закрыть').show();
+        tg.MainButton.onClick(() => tg.close());
+    </script>
+</body>
+</html>
