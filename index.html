@@ -45,7 +45,6 @@
         const chat = document.getElementById('chat');
         const input = document.getElementById('cmdInput');
         const initData = tg.initData || '';
-        // Твой постоянный ngrok-домен
         const API_URL = 'https://slightly-projector-rigging.ngrok-free.dev/api/command';
 
         function add(text, type) {
@@ -56,22 +55,28 @@
             chat.scrollTop = chat.scrollHeight;
         }
 
-        async function sendCmd(explicitCmd) {
+        function sendCmd(explicitCmd) {
             const cmd = explicitCmd || input.value.trim();
             if (!cmd) return;
             add(explicitCmd || input.value, 'user');
             if (!explicitCmd) input.value = '';
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
-                    body: JSON.stringify({ command: cmd, tg_data: initData })
-                });
-                const data = await response.json();
-                add(data.status === 'success' ? data.reply : '❌ ' + (data.message || 'Ошибка'), 'bot');
-            } catch (e) {
+
+            // Используем XMLHttpRequest вместо fetch (надёжнее в WebApp)
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', API_URL, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    const data = JSON.parse(xhr.responseText);
+                    add(data.status === 'success' ? data.reply : '❌ ' + (data.message || 'Ошибка'), 'bot');
+                } else {
+                    add('❌ Ошибка HTTP ' + xhr.status, 'bot');
+                }
+            };
+            xhr.onerror = function() {
                 add('❌ Ошибка соединения', 'bot');
-            }
+            };
+            xhr.send(JSON.stringify({ command: cmd, tg_data: initData }));
         }
 
         input.addEventListener('keypress', e => { if (e.key === 'Enter') sendCmd(); });
