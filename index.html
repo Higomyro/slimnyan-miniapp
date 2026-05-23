@@ -3,64 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nyanbot (miniapp)</title>
+    <title>Nyanbot Console</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { 
-            --bg: #09090e; 
-            --panel: #131322; 
-            --accent: #ff2a5f; 
-            --green: #00ff88; 
-            --blue: #00bfff;
-            --text: #f0f0f5; 
-        }
+        :root { --bg: #0b0b12; --panel: #151520; --accent: #e94560; --green: #00e676; --text: #eee; }
         * { margin:0; padding:0; box-sizing:border-box; font-family: -apple-system, sans-serif; }
-        body { background:var(--bg); color:var(--text); height:100vh; display:flex; flex-direction:column; overflow:hidden; }
-        .header { padding:18px; text-align:center; font-size:20px; font-weight:800; background:rgba(19,19,34,0.7); backdrop-filter:blur(10px); border-bottom:1px solid rgba(255,255,255,0.05); }
-        .header span { color:var(--accent); }
-        .chat { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:12px; }
-        .msg { max-width:85%; padding:12px 16px; border-radius:18px; font-size:14.5px; line-height:1.45; animation:fadeIn 0.3s ease forwards; transform:translateY(10px); opacity:0; }
-        @keyframes fadeIn { to { transform:translateY(0); opacity:1; } }
-        .msg.user { background:linear-gradient(135deg,#254b7d,#1a3356); align-self:flex-end; }
-        .msg.bot { background:var(--panel); align-self:flex-start; }
-        .msg.rocket { background:linear-gradient(145deg,#1d0b2e,#11051c); border:1px solid var(--accent); box-shadow:0 0 15px rgba(255,42,95,0.4); align-self:center; text-align:center; width:90%; white-space:pre-line; }
-        .actions { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; padding:12px; background:rgba(19,19,34,0.4); border-top:1px solid rgba(255,255,255,0.03); }
-        .actions button { background:var(--panel); color:#fff; border:1px solid rgba(255,255,255,0.05); padding:12px 8px; border-radius:14px; font-size:13px; font-weight:600; cursor:pointer; }
-        .actions button:active { transform:scale(0.92); }
-        .input-container { padding:0 12px 20px; }
-        .input-row { display:flex; gap:8px; background:var(--panel); padding:6px 6px 6px 16px; border-radius:30px; border:1px solid rgba(255,255,255,0.05); align-items:center; }
-        .input-row input { flex:1; border:none; background:transparent; color:#fff; font-size:15px; outline:none; }
-        .input-row button { width:40px; height:40px; border-radius:50%; border:none; background:var(--accent); color:#fff; font-size:16px; cursor:pointer; }
+        body { background:var(--bg); color:var(--text); height:100vh; display:flex; flex-direction:column; }
+        .header { padding:16px; text-align:center; font-size:18px; font-weight:700; border-bottom:1px solid #222; }
+        .chat { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; }
+        .msg { max-width:85%; padding:10px 14px; border-radius:14px; font-size:14px; line-height:1.4; animation:fadeIn 0.2s; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+        .msg.user { background:#1e3a5f; align-self:flex-end; border-bottom-right-radius:4px; }
+        .msg.bot { background:var(--panel); align-self:flex-start; border-bottom-left-radius:4px; }
+        .msg.rocket { background:linear-gradient(145deg,#1d0b2e,#11051c); border:1px solid var(--accent); box-shadow:0 0 15px rgba(255,42,95,0.4); align-self:center; text-align:center; width:90%; }
+        .actions { display:flex; flex-wrap:wrap; gap:8px; padding:12px; }
+        .actions button { background:#1f1f30; color:var(--green); border:none; padding:10px 14px; border-radius:20px; font-size:13px; cursor:pointer; }
+        .input-row { display:flex; gap:8px; padding:0 12px 16px; }
+        .input-row input { flex:1; padding:14px; border-radius:24px; border:none; background:#1f1f30; color:#fff; font-size:15px; }
+        .input-row button { width:48px; height:48px; border-radius:50%; border:none; background:var(--accent); color:#fff; font-size:18px; cursor:pointer; }
         .cashout-btn { background:linear-gradient(90deg,#00ff88,#00e676); color:#000; padding:14px; border:none; border-radius:14px; font-size:16px; font-weight:800; cursor:pointer; width:100%; margin-top:8px; }
         .skip-btn { background:transparent; color:#ffaa00; border:1px solid #ffaa00; padding:10px; border-radius:14px; font-size:14px; cursor:pointer; width:100%; margin-top:4px; }
-        #rocketBetRow { margin-bottom:10px; }
-        #rocketBetRow button { background:var(--blue); }
     </style>
 </head>
 <body>
-    <div class="header">🐾 Nyanbot <span>(miniapp)</span></div>
-    
+    <div class="header">🚀 Nyanbot Console</div>
     <div class="chat" id="chat">
-        <div class="msg bot">✅ Подключено к системе Nyanbot!</div>
-        <div class="msg bot">💡 Команды: мяу, баланс, ты кто, ракета 100, рул кра 500</div>
+        <div class="msg bot">✅ Подключено к боту!</div>
+        <div class="msg bot">💡 Пиши любые команды: мяу, баланс, ты кто, ракета 100, рул кра 500, бизнес, казино...</div>
     </div>
-    
     <div class="actions">
-        <button onclick="sendCmd('мяу')">🐾Мяу</button>
-        <button onclick="sendCmd('баланс')">💗Баланс</button>
-        <button onclick="sendCmd('ты кто')">👤Профиль</button>
-        <button onclick="startRocket()">🚀Ракета</button>
+        <button onclick="sendCmd('мяу')">🐾 Мяу</button>
+        <button onclick="sendCmd('баланс')">💗 Баланс</button>
+        <button onclick="sendCmd('ты кто')">👤 Профиль</button>
+        <button onclick="sendCmd('ракета 100')">🚀 Ракета</button>
+        <button onclick="sendCmd('рул кра 50')">🎡 Рулетка</button>
+        <button onclick="sendCmd('бизнес')">🏭 Бизнес</button>
+        <button onclick="sendCmd('казино')">🎰 Казино</button>
     </div>
-    
-    <div class="input-container">
-        <div class="input-row" id="rocketBetRow" style="display:none;">
-            <input type="number" id="betInput" placeholder="Сумма ставки..." value="100">
-            <button onclick="launchRocket()">🚀</button>
-        </div>
-        <div class="input-row">
-            <input type="text" id="cmdInput" placeholder="Введите команду..." autofocus>
-            <button onclick="sendCmd()">➔</button>
-        </div>
+    <div class="input-row">
+        <input type="text" id="cmdInput" placeholder="Любая команда..." autofocus>
+        <button onclick="sendCmd()">▶</button>
     </div>
 
     <script>
@@ -77,7 +59,7 @@
             div.className = 'msg ' + type;
             div.textContent = text;
             chat.appendChild(div);
-            setTimeout(() => { chat.scrollTop = chat.scrollHeight; }, 50);
+            chat.scrollTop = chat.scrollHeight;
             return div;
         }
 
@@ -92,137 +74,12 @@
             xhr.onload = function() {
                 if (xhr.status === 200) {
                     const data = JSON.parse(xhr.responseText);
-                    add(data.status === 'success' ? data.reply : '❌ ' + (data.message || 'Ошибка'), 'bot');
+                    if (data.reply) add(data.reply, 'bot');
+                    else if (data.message) add('❌ ' + data.message, 'bot');
                 }
             };
-            xhr.onerror = function() { add('❌ Ошибка сети', 'bot'); };
+            xhr.onerror = function() { add('❌ Ошибка', 'bot'); };
             xhr.send(JSON.stringify({ command: cmd, tg_data: initData }));
-        }
-
-        let rocketMsg = null;
-        let rocketInterval = null;
-
-        function startRocket() {
-            const row = document.getElementById('rocketBetRow');
-            row.style.display = row.style.display === 'flex' ? 'none' : 'flex';
-        }
-
-        function launchRocket() {
-            const bet = parseInt(document.getElementById('betInput').value) || 100;
-            document.getElementById('rocketBetRow').style.display = 'none';
-            
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', API_URL, true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.onload = function() {
-                const data = JSON.parse(xhr.responseText);
-                if (data.status === 'success' && data.game) {
-                    rocketMsg = add(
-                        '🚀 Ракета взлетает!\n\n🟢 Шанс: 97%\n\n💰 Ставка: ' + bet + '🪙\n📈 x1.00\n💎 ' + bet + '🪙',
-                        'rocket'
-                    );
-                    
-                    // Кнопка ЗАБРАТЬ
-                    const cashoutBtn = document.createElement('button');
-                    cashoutBtn.className = 'cashout-btn';
-                    cashoutBtn.textContent = '💰 ЗАБРАТЬ ВЫИГРЫШ';
-                    cashoutBtn.onclick = cashoutRocket;
-                    rocketMsg.appendChild(cashoutBtn);
-                    
-                    updateRocketState(bet);
-                } else {
-                    add('❌ ' + (data.message || 'Ошибка'), 'bot');
-                }
-            };
-            xhr.send(JSON.stringify({ action: 'rocket_start', bet: bet, tg_data: initData }));
-        }
-
-        function updateRocketState(bet) {
-            if (rocketInterval) clearInterval(rocketInterval);
-            
-            rocketInterval = setInterval(() => {
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', API_URL, true);
-                xhr.setRequestHeader('Content-Type', 'application/json');
-                xhr.onload = function() {
-                    const data = JSON.parse(xhr.responseText);
-                    if (!rocketMsg) { clearInterval(rocketInterval); return; }
-                    
-                    if (data.status === 'success' && data.active && !data.cashed_out) {
-                        const mult = data.multiplier;
-                        const pot = data.potential || Math.floor(bet * mult);
-                        rocketMsg.childNodes[0].textContent =
-                            '🚀 Ракета взлетает!\n\n🟢 Шанс: ' + (mult < 1.5 ? 97 : mult < 2.5 ? 82 : 50) + '%\n\n💰 Ставка: ' + bet + '🪙\n📈 x' + mult + '\n💎 ' + pot + '🪙';
-                    } else if (!data.active || data.cashed_out) {
-                        clearInterval(rocketInterval);
-                        
-                        // Убираем старые кнопки
-                        const oldBtns = rocketMsg.querySelectorAll('button');
-                        oldBtns.forEach(b => b.remove());
-                        
-                        if (data.cashed_out) {
-                            const winnings = data.winnings || 0;
-                            const cashoutMult = data.cashout_multiplier || data.multiplier || 1;
-                            const crashMult = data.multiplier || cashoutMult;
-                            
-                            rocketMsg.childNodes[0].textContent =
-                                '✅ СНЯТО НА x' + cashoutMult + '!\n💰 Выигрыш: ' + winnings + '🪙\n📈 Ракета взорвалась на x' + crashMult;
-                            
-                            // Кнопка ПРОПУСТИТЬ после снятия
-                            const skipBtn = document.createElement('button');
-                            skipBtn.className = 'skip-btn';
-                            skipBtn.textContent = '⏭ ПРОПУСТИТЬ';
-                            skipBtn.onclick = function() {
-                                rocketMsg.childNodes[0].textContent = '⏭ Пропущено\n💰 Выигрыш: ' + winnings + '🪙';
-                                const btns = rocketMsg.querySelectorAll('button');
-                                btns.forEach(b => b.remove());
-                                rocketMsg = null;
-                            };
-                            rocketMsg.appendChild(skipBtn);
-                        } else {
-                            const crashMult = data.multiplier || 1;
-                            rocketMsg.childNodes[0].textContent =
-                                '💥 РАКЕТА ВЗОРВАЛАСЬ НА x' + crashMult + '!\n😢 Ставка ' + bet + '🪙 сгорела';
-                            rocketMsg = null;
-                        }
-                    }
-                };
-                xhr.send(JSON.stringify({ action: 'rocket_state', tg_data: initData }));
-            }, 600);
-        }
-
-        function cashoutRocket() {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', API_URL, true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.onload = function() {
-                const data = JSON.parse(xhr.responseText);
-                if (data.status === 'success' && rocketMsg) {
-                    const mult = data.multiplier || 1;
-                    const winnings = data.winnings || 0;
-                    
-                    // Убираем старые кнопки
-                    const oldBtns = rocketMsg.querySelectorAll('button');
-                    oldBtns.forEach(b => b.remove());
-                    
-                    rocketMsg.childNodes[0].textContent =
-                        '✅ СНЯТО НА x' + mult + '!\n💰 Выигрыш: ' + winnings + '🪙\nРакета ещё летит...';
-                    
-                    // Кнопка ПРОПУСТИТЬ
-                    const skipBtn = document.createElement('button');
-                    skipBtn.className = 'skip-btn';
-                    skipBtn.textContent = '⏭ ПРОПУСТИТЬ';
-                    skipBtn.onclick = function() {
-                        rocketMsg.childNodes[0].textContent = '⏭ Пропущено\n💰 Выигрыш: ' + winnings + '🪙';
-                        const btns = rocketMsg.querySelectorAll('button');
-                        btns.forEach(b => b.remove());
-                        rocketMsg = null;
-                        clearInterval(rocketInterval);
-                    };
-                    rocketMsg.appendChild(skipBtn);
-                }
-            };
-            xhr.send(JSON.stringify({ action: 'rocket_cashout', tg_data: initData }));
         }
 
         input.addEventListener('keypress', e => { if (e.key === 'Enter') sendCmd(); });
