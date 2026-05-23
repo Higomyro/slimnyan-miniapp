@@ -47,7 +47,7 @@
         const input = document.getElementById('cmdInput');
         const initData = tg.initData || '';
 
-        // Твой Cloudflare туннель
+        // 👇 Вот сюда вставлен актуальный Cloudflare URL
         const API_URL = 'https://confidential-men-endorsement-hop.trycloudflare.com/api/command';
 
         function add(text, type) {
@@ -75,7 +75,7 @@
                 if (data.status === 'success') {
                     add(data.reply, 'bot');
                 } else {
-                    add('❌ ' + data.message, 'bot');
+                    add('❌ ' + (data.message || 'Ошибка'), 'bot');
                 }
             } catch (e) {
                 add('❌ Ошибка соединения', 'bot');
