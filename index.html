@@ -3,39 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Slimnyan Console</title>
+    <title>Nyanbot (miniapp)</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --bg: #0b0b12; --panel: #151520; --accent: #e94560; --green: #00e676; --text: #eee; }
-        * { margin:0; padding:0; box-sizing:border-box; font-family: -apple-system, sans-serif; }
-        body { background:var(--bg); color:var(--text); height:100vh; display:flex; flex-direction:column; }
-        .header { padding:16px; text-align:center; font-size:18px; font-weight:700; border-bottom:1px solid #222; }
-        .chat { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; }
-        .msg { max-width:85%; padding:10px 14px; border-radius:14px; font-size:14px; line-height:1.4; }
-        .msg.user { background:#1e3a5f; align-self:flex-end; border-bottom-right-radius:4px; }
-        .msg.bot { background:var(--panel); align-self:flex-start; border-bottom-left-radius:4px; }
-        .actions { display:flex; flex-wrap:wrap; gap:8px; padding:12px; }
-        .actions button { background:#1f1f30; color:var(--green); border:none; padding:10px 14px; border-radius:20px; font-size:13px; cursor:pointer; }
-        .input-row { display:flex; gap:8px; padding:0 12px 16px; }
-        .input-row input { flex:1; padding:14px; border-radius:24px; border:none; background:#1f1f30; color:#fff; font-size:15px; }
-        .input-row button { width:48px; height:48px; border-radius:50%; border:none; background:var(--accent); color:#fff; font-size:18px; cursor:pointer; }
+        :root { 
+            --bg: #09090e; 
+            --panel: #131322; 
+            --panel-brighter: #1a1a30;
+            --accent: #ff2a5f; 
+            --accent-glow: rgba(255, 42, 95, 0.4);
+            --green: #00ff88; 
+            --green-glow: rgba(0, 255, 136, 0.3);
+            --blue: #00bfff;
+            --text: #f0f0f5; 
+            --text-muted: #80809b;
+        }
+        
+        * { margin:0; padding:0; box-sizing:border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden;
+            background-image: radial-gradient(circle at 50% 10%, #1a102f 0%, var(--bg) 70%);
+        }
+        
+        .header { 
+            padding: 18px; 
+            text-align: center; 
+            font-size: 20px; 
+            font-weight: 800; 
+            letter-spacing: 0.5px;
+            background: rgba(19, 19, 34, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .header span {
+            color: var(--accent);
+        }
+        
+        .chat { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px;
+            scroll-behavior: smooth;
+        }
+        
+        /* Плавное появление сообщений */
+        .msg { 
+            max-width: 85%; 
+            padding: 12px 16px; 
+            border-radius: 18px; 
+            font-size: 14.5px; 
+            line-height: 1.45; 
+            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transform: translateY(10px);
+            opacity: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        @keyframes fadeIn {
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .msg.user { 
+            background: linear-gradient(135deg, #254b7d, #1a3356); 
+            align-self: flex-end; 
+            border-bottom-right-radius: 4px; 
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .msg.bot { 
+            background: var(--panel); 
+            align-self: flex-start; 
+            border-bottom-left-radius: 4px; 
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+        
+        .msg.rocket { 
+            background: linear-gradient(145deg, #1d0b2e, #11051c); 
+            border: 1px solid var(--accent); 
+            box-shadow: 0 0 15px var(--accent-glow);
+            align-self: center; 
+            text-align: center; 
+            width: 90%;
+            white-space: pre-line;
+        }
+        
+        .actions { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px; 
+            padding: 12px;
+            background: rgba(19, 19, 34, 0.4);
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        
+        .actions button { 
+            background: var(--panel); 
+            color: #fff; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            padding: 12px 8px; 
+            border-radius: 14px; 
+            font-size: 13px; 
+            font-weight: 600;
+            cursor: pointer; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .actions button:active {
+            transform: scale(0.92);
+            background: var(--panel-brighter);
+            border-color: var(--blue);
+        }
+
+        .actions button .icon {
+            font-size: 18px;
+        }
+        
+        .input-container {
+            padding: 0 12px 20px;
+            background: transparent;
+        }
+
+        .input-row { 
+            display: flex; 
+            gap: 8px; 
+            background: var(--panel);
+            padding: 6px 6px 6px 16px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.05);
+            align-items: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-row:focus-within {
+            border-color: rgba(0, 191, 255, 0.5);
+        }
+        
+        .input-row input { 
+            flex: 1; 
+            border: none; 
+            background: transparent; 
+            color: #fff; 
+            font-size: 15px; 
+            outline: none;
+        }
+        
+        .input-row input::placeholder { color: var(--text-muted); }
+
+        .input-row button { 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            border: none; 
+            background: var(--accent); 
+            color: #fff; 
+            font-size: 16px; 
+            cursor: pointer; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px var(--accent-glow);
+            transition: transform 0.2s ease;
+        }
+
+        .input-row button:active { transform: scale(0.9); }
+        
+        #rocketBetRow {
+            margin-bottom: 10px;
+            border-radius: 20px;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        #rocketBetRow button {
+            background: var(--blue);
+            box-shadow: 0 0 10px rgba(0, 191, 255, 0.4);
+        }
+        
+        .cashout-btn { 
+            background: linear-gradient(90deg, #00ff88, #00e676); 
+            color: #000; 
+            padding: 14px 20px; 
+            border: none; 
+            border-radius: 14px; 
+            font-size: 16px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            width: 100%; 
+            margin-top: 12px; 
+            box-shadow: 0 4px 15px var(--green-glow);
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+        }
+
+        .cashout-btn:active {
+            transform: scale(0.96);
+            filter: brightness(1.1);
+        }
+
+        /* Красивый скроллбар */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     </style>
 </head>
 <body>
-    <div class="header">🚀 Slimnyan Console</div>
+    <div class="header">🐾 Nyanbot <span>(miniapp)</span></div>
+    
     <div class="chat" id="chat">
-        <div class="msg bot">✅ Подключено к боту!</div>
-        <div class="msg bot">💡 Команды: мяу, баланс, ты кто, ракета 100, рул кра 500</div>
+        <div class="msg bot">✅ Подключено к системе Nyanbot!</div>
+        <div class="msg bot">💡 Доступные команды:<br>• мяу<br>• баланс<br>• ты кто<br>• ракета [ставка]<br>• рул кра [ставка]</div>
     </div>
+    
     <div class="actions">
-        <button onclick="sendCmd('мяу')">🐾 Мяу</button>
-        <button onclick="sendCmd('баланс')">💗 Баланс</button>
-        <button onclick="sendCmd('ты кто')">👤 Профиль</button>
-        <button onclick="sendCmd('ракета 100')">🚀 Ракета</button>
+        <button onclick="sendCmd('мяу')"><span class="icon">🐾</span>Мяу</button>
+        <button onclick="sendCmd('баланс')"><span class="icon">💗</span>Баланс</button>
+        <button onclick="sendCmd('ты кто')"><span class="icon">👤</span>Профиль</button>
+        <button onclick="startRocket()"><span class="icon">🚀</span>Ракета</button>
     </div>
-    <div class="input-row">
-        <input type="text" id="cmdInput" placeholder="Команда..." autofocus>
-        <button onclick="sendCmd()">▶</button>
+    
+    <div class="input-container">
+        <!-- Ввод ставки для ракеты -->
+        <div class="input-row" id="rocketBetRow" style="display:none;">
+            <input type="number" id="betInput" placeholder="Сумма ставки..." value="100">
+            <button onclick="launchRocket()">🚀</button>
+        </div>
+
+        <!-- Основной ввод -->
+        <div class="input-row">
+            <input type="text" id="cmdInput" placeholder="Введите команду..." autofocus>
+            <button onclick="sendCmd()">➔</button>
+        </div>
     </div>
 
     <script>
@@ -52,16 +269,19 @@
             div.className = 'msg ' + type;
             div.textContent = text;
             chat.appendChild(div);
-            chat.scrollTop = chat.scrollHeight;
+            // Плавный скролл вниз
+            setTimeout(() => {
+                chat.scrollTop = chat.scrollHeight;
+            }, 50);
+            return div;
         }
 
         function sendCmd(explicitCmd) {
             const cmd = explicitCmd || input.value.trim();
             if (!cmd) return;
-            add(explicitCmd || input.value, 'user');
+            add(cmd, 'user');
             if (!explicitCmd) input.value = '';
 
-            // Используем XMLHttpRequest вместо fetch (надёжнее в WebApp)
             const xhr = new XMLHttpRequest();
             xhr.open('POST', API_URL, true);
             xhr.setRequestHeader('Content-Type', 'application/json');
@@ -69,14 +289,86 @@
                 if (xhr.status === 200) {
                     const data = JSON.parse(xhr.responseText);
                     add(data.status === 'success' ? data.reply : '❌ ' + (data.message || 'Ошибка'), 'bot');
-                } else {
-                    add('❌ Ошибка HTTP ' + xhr.status, 'bot');
                 }
             };
-            xhr.onerror = function() {
-                add('❌ Ошибка соединения', 'bot');
-            };
+            xhr.onerror = function() { add('❌ Ошибка сети', 'bot'); };
             xhr.send(JSON.stringify({ command: cmd, tg_data: initData }));
+        }
+
+        // Логика игры "Ракета"
+        let rocketMsg = null;
+        
+        function startRocket() {
+            const row = document.getElementById('rocketBetRow');
+            row.style.display = row.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function launchRocket() {
+            const bet = parseInt(document.getElementById('betInput').value) || 100;
+            document.getElementById('rocketBetRow').style.display = 'none';
+            
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', API_URL, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onload = function() {
+                const data = JSON.parse(xhr.responseText);
+                if (data.status === 'success' && data.game) {
+                    rocketMsg = add('🚀 Ракета взлетает!\n\n🟢 Шанс: 97%\n\n💰 Ставка: ' + bet + '🪙\n📈 x1.16\n💎 ' + bet + '🪙', 'rocket');
+                    
+                    const cashoutBtn = document.createElement('button');
+                    cashoutBtn.className = 'cashout-btn';
+                    cashoutBtn.textContent = '💰 ЗАБРАТЬ ВЫИГРЫШ';
+                    cashoutBtn.onclick = cashoutRocket;
+                    rocketMsg.appendChild(cashoutBtn);
+                    
+                    updateRocketState();
+                } else {
+                    add('❌ ' + (data.message || 'Ошибка'), 'bot');
+                }
+            };
+            xhr.send(JSON.stringify({ action: 'rocket_start', bet: bet, tg_data: initData }));
+        }
+
+        function updateRocketState() {
+            const interval = setInterval(() => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', API_URL, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.onload = function() {
+                    const data = JSON.parse(xhr.responseText);
+                    if (data.status === 'success' && data.active) {
+                        const mult = data.multiplier;
+                        const pot = data.potential;
+                        const chance = mult < 1.5 ? 97 : (mult < 2.5 ? 82 : (mult < 4.0 ? 50 : (mult < 6.0 ? 32 : 18)));
+                        rocketMsg.childNodes[0].textContent = '🚀 Ракета взлетает!\n\n🟢 Шанс: ' + chance + '%\n\n💰 Ставка: ' + data.bet + '🪙\n📈 x' + mult + '\n💎 ' + pot + '🪙';
+                    } else if (!data.active) {
+                        clearInterval(interval);
+                        if (data.cashed_out) {
+                            rocketMsg.childNodes[0].textContent = '✅ СНЯТО НА x' + data.multiplier + '!\n💰 Выигрыш: ' + data.winnings + '🪙';
+                        } else {
+                            rocketMsg.childNodes[0].textContent = '💥 РАКЕТА ВЗОРВАЛАСЬ НА x' + data.multiplier + '!\n😢 Ставка сгорела';
+                        }
+                        const btn = rocketMsg.querySelector('.cashout-btn');
+                        if (btn) btn.remove();
+                    }
+                };
+                xhr.send(JSON.stringify({ action: 'rocket_state', tg_data: initData }));
+            }, 600);
+        }
+
+        function cashoutRocket() {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', API_URL, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onload = function() {
+                const data = JSON.parse(xhr.responseText);
+                if (data.status === 'success') {
+                    rocketMsg.childNodes[0].textContent = '✅ СНЯТО НА x' + data.multiplier + '!\n💰 Выигрыш: ' + data.winnings + '🪙';
+                    const btn = rocketMsg.querySelector('.cashout-btn');
+                    if (btn) btn.remove();
+                }
+            };
+            xhr.send(JSON.stringify({ action: 'rocket_cashout', tg_data: initData }));
         }
 
         input.addEventListener('keypress', e => { if (e.key === 'Enter') sendCmd(); });
