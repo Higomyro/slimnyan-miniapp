@@ -24,6 +24,8 @@
         .msg.user { background:linear-gradient(135deg,#254b7d,#1a3356); align-self:flex-end; }
         .msg.bot { background:var(--panel); align-self:flex-start; }
         .msg.rocket { background:linear-gradient(145deg,#1d0b2e,#11051c); border:1px solid var(--accent); box-shadow:0 0 15px rgba(255,42,95,0.4); align-self:center; text-align:center; width:90%; white-space:pre-line; }
+        .menu-buttons { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:8px; }
+        .menu-buttons button { background:var(--panel); color:var(--green); border:1px solid rgba(255,255,255,0.1); padding:10px; border-radius:10px; font-size:13px; cursor:pointer; }
         .actions { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; padding:12px; background:rgba(19,19,34,0.4); border-top:1px solid rgba(255,255,255,0.03); }
         .actions button { background:var(--panel); color:#fff; border:1px solid rgba(255,255,255,0.05); padding:12px 8px; border-radius:14px; font-size:13px; font-weight:600; cursor:pointer; }
         .actions button:active { transform:scale(0.92); }
@@ -80,6 +82,37 @@
             return div;
         }
 
+        function addMenu(text) {
+            const div = document.createElement('div');
+            div.className = 'msg bot';
+            div.innerHTML = text.replace(/\n/g, '<br>');
+            
+            // Добавляем кнопки меню
+            const btnContainer = document.createElement('div');
+            btnContainer.className = 'menu-buttons';
+            
+            const buttons = [
+                {text: '💗 Баланс', cmd: 'баланс'},
+                {text: '🏆 Топ мяу', cmd: 'топмяу'},
+                {text: '👤 Профиль', cmd: 'ты кто'},
+                {text: '🚀 Ракета 100', cmd: 'ракета 100'},
+                {text: '🎰 Рулетка', cmd: 'рул кра 50'},
+                {text: '🏭 Бизнес', cmd: 'бизнес'}
+            ];
+            
+            buttons.forEach(b => {
+                const btn = document.createElement('button');
+                btn.textContent = b.text;
+                btn.onclick = function() { sendCmd(b.cmd); };
+                btnContainer.appendChild(btn);
+            });
+            
+            div.appendChild(btnContainer);
+            chat.appendChild(div);
+            setTimeout(() => { chat.scrollTop = chat.scrollHeight; }, 50);
+            return div;
+        }
+
         // При загрузке запрашиваем меню
         function loadMenu() {
             const xhr = new XMLHttpRequest();
@@ -90,7 +123,7 @@
                     const data = JSON.parse(xhr.responseText);
                     if (data.reply) {
                         chat.innerHTML = '';
-                        add(data.reply, 'bot');
+                        addMenu(data.reply);
                     }
                 }
             };
