@@ -26,19 +26,21 @@
         .actions button { background:#1f1f30; color:var(--green); border:none; padding:10px 14px; border-radius:20px; font-size:13px; cursor:pointer; }
         .input-row { display:flex; gap:8px; padding:0 12px 16px; }
         .input-row input { flex:1; padding:14px; border-radius:24px; border:none; background:#1f1f30; color:#fff; font-size:15px; }
-        .input-row button { width:48px; height:48px; border-radius:50%; border:none; background:var(--accent); color:#fff; font-size:18px; }
+        .input-row button { width:48px; height:48px; border-radius:50%; border:none; background:var(--accent); color:#fff; font-size:18px; cursor:pointer; }
     </style>
 </head>
 <body>
     <div class="header">🚀 Slimnyan Console</div>
     <div class="log" id="log">
-        <div class="msg bot">🤖 Привет! Я локальное ядро бота.<br>Пиши команды — всё работает офлайн.</div>
+        <div class="msg bot">🤖 Привет! Консоль готова.</div>
+        <div class="msg bot">💡 Команды: мяу, баланс, ты кто, топмяу, ракета 100</div>
     </div>
     <div class="actions">
         <button onclick="run('мяу')">🐾 Мяу</button>
         <button onclick="run('баланс')">💗 Баланс</button>
         <button onclick="run('ты кто')">👤 Профиль</button>
         <button onclick="run('топмяу')">🏆 Топ</button>
+        <button onclick="run('ракета 100')">🚀 Ракета</button>
     </div>
     <div class="input-row">
         <input id="cmd" placeholder="Команда..." autofocus>
@@ -53,22 +55,21 @@
         const log = document.getElementById('log');
         const cmdInput = document.getElementById('cmd');
 
-        // Достаём реальные данные пользователя из Telegram
+        // Данные пользователя из Telegram
         const user = tg.initDataUnsafe?.user || {};
         const uid = user.id ? String(user.id) : 'unknown';
         const firstName = user.first_name || 'Котик';
 
-        // Локальное хранилище (эмулирует bot_data.json)
-        const storageKey = 'slimnyan_user_' + uid;
-        let localData = JSON.parse(localStorage.getItem(storageKey)) || {
+        // Локальное хранилище
+        const storageKey = 'slimnyan_' + uid;
+        let data = JSON.parse(localStorage.getItem(storageKey)) || {
             balls: 0,
             meowcoins: 1000,
-            last_meow: 0,
-            refs: 0
+            last_meow: 0
         };
 
         function save() {
-            localStorage.setItem(storageKey, JSON.stringify(localData));
+            localStorage.setItem(storageKey, JSON.stringify(data));
         }
 
         function add(msg, type) {
@@ -83,49 +84,71 @@
             const cmd = (explicit || cmdInput.value).trim().toLowerCase();
             if (!cmd) return;
 
-            add(cmd, 'user');
+            add((explicit || cmdInput.value).trim(), 'user');
             if (!explicit) cmdInput.value = '';
 
             let reply = '';
 
-            // ── МЯУ ──
+            // МЯУ
             if (['мяу', '.мяу', '!мяу'].includes(cmd)) {
                 const now = Date.now();
-                if (now - localData.last_meow < 3600000) {
-                    const left = Math.ceil((3600000 - (now - localData.last_meow)) / 60000);
+                if (now - data.last_meow < 3600000) {
+                    const left = Math.ceil((3600000 - (now - data.last_meow)) / 60000);
                     reply = `⏳ ${firstName}, жди ещё ${left} мин.`;
                 } else {
-                    localData.balls += 1;
-                    localData.last_meow = now;
+                    data.balls += 1;
+                    data.last_meow = now;
                     const coins = Math.floor(Math.random() * 30) + 1;
-                    localData.meowcoins += coins;
+                    data.meowcoins += coins;
                     save();
-                    reply = `🐾 ${firstName} мяукнул(а) +1 балл\n🪙 +${coins} мяукоинов`;
+                    reply = `🐾 ${firstName} вы мяукнули и получили +1 балл\n🪙 Вам подкинули ${coins} мяукоинов\n\n💗 Баллы: ${data.balls}\n🪙 Мяукоины: ${data.meowcoins}`;
                 }
             }
-            // ── БАЛАНС ──
+            // БАЛАНС
             else if (['бал', 'баланс', 'балл'].includes(cmd)) {
-                reply = `💗 ${firstName}\nБаллы: ${localData.balls}\n🪙 Мяукоины: ${localData.meowcoins}`;
+                reply = `💗 ${firstName}, твой баланс:\nБаллы: ${data.balls}\n🪙 Мяукоины: ${data.meowcoins}`;
             }
-            // ── ПРОФИЛЬ ──
+            // ПРОФИЛЬ
             else if (['префикс', 'кто я', 'статус'].includes(cmd)) {
-                reply = `👤 ${firstName}\nСтатус: 👤 User`;
+                reply = `🌟 ${firstName}\nСтатус: 👤 User`;
             }
             else if (cmd === 'ты кто') {
-                reply = `👤 ${firstName}\nБаллы: ${localData.balls}\n🪙 Мяукоины: ${localData.meowcoins}`;
+                reply = `👤 Пользователь: ${firstName}\n💗 Баллы: ${data.balls}\n🪙 Мяукоины: ${data.meowcoins}`;
             }
-            // ── ТОПЫ (просто заглушка) ──
+            // ТОП
             else if (cmd === 'топмяу') {
-                reply = `🏆 Топ мяукалок:\n\n1. ${firstName} — ${localData.balls} баллов`;
+                reply = `🏆 Топ мяукалок:\n\n1. ${firstName} — ${data.balls} баллов\n\n(локальный топ)`;
             }
             else if (['топкоины', 'топмяукоины'].includes(cmd)) {
-                reply = `🪙 Топ мяукоинов:\n\n1. ${firstName} — ${localData.meowcoins}`;
+                reply = `🪙 Топ мяукоинов:\n\n1. ${firstName} — ${data.meowcoins}\n\n(локальный топ)`;
             }
+            // РАКЕТА (простая версия)
+            else if (cmd.startsWith('ракета')) {
+                const parts = cmd.split(' ');
+                const bet = parseInt(parts[1]) || 0;
+                if (bet <= 0) {
+                    reply = '❌ Укажи сумму! Пример: ракета 100';
+                } else if (data.meowcoins < bet) {
+                    reply = `❌ Недостаточно мяукоинов! У вас ${data.meowcoins}🪙`;
+                } else {
+                    data.meowcoins -= bet;
+                    const win = Math.random() < 0.5;
+                    if (win) {
+                        const winnings = Math.floor(bet * (1 + Math.random() * 2));
+                        data.meowcoins += winnings;
+                        reply = `🚀 Ракета взлетела!\n💰 Ставка: ${bet}🪙\n🎉 Выигрыш: ${winnings}🪙\n💎 Баланс: ${data.meowcoins}🪙`;
+                    } else {
+                        reply = `💥 Ракета взорвалась!\n💰 Ставка: ${bet}🪙 — СГОРЕЛИ!\n💎 Баланс: ${data.meowcoins}🪙`;
+                    }
+                    save();
+                }
+            }
+            // НЕИЗВЕСТНАЯ
             else {
                 reply = `❌ Неизвестная команда: ${cmd}`;
             }
 
-            setTimeout(() => add(reply, 'bot'), 200);
+            setTimeout(() => add(reply, 'bot'), 300);
         }
 
         cmdInput.addEventListener('keypress', e => {
