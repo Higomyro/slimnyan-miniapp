@@ -6,196 +6,37 @@
     <title>Slimnyan Console</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --bg-dark: #060609;
-            --panel-bg: rgba(13, 13, 23, 0.65);
-            --border-color: rgba(255, 255, 255, 0.04);
-            --accent-glow: linear-gradient(135deg, #ff0055, #7a22ff);
-            --accent-solid: #ff0055;
-            --text-primary: #ffffff;
-            --text-secondary: #7d8b9e;
-            --system-green: #00ffaa;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', Roboto, sans-serif;
-        }
-
-        body {
-            background: var(--bg-dark);
-            background-image: radial-gradient(circle at 50% -20%, #1a0f30 0%, var(--bg-dark) 75%);
-            color: var(--text-primary);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .app-bar {
-            padding: 18px;
-            text-align: center;
-            border-bottom: 1px solid var(--border-color);
-            backdrop-filter: blur(20px);
-            background: rgba(6, 6, 9, 0.5);
-        }
-
-        .app-bar h1 {
-            font-size: 17px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            background: linear-gradient(90deg, #fff, var(--text-secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .terminal-screen {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .bubble {
-            max-width: 85%;
-            padding: 12px 16px;
-            border-radius: 16px;
-            font-size: 14px;
-            line-height: 1.45;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            animation: cubic-bezier(0.1, 1, 0.1, 1) bounceIn 0.4s;
-        }
-
-        @keyframes bounceIn {
-            from { opacity: 0; transform: translateY(15px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .bubble.user {
-            background: var(--accent-glow);
-            color: #fff;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-        }
-
-        .bubble.bot {
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(10px);
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-        }
-
-        .controls-area {
-            background: rgba(6, 6, 9, 0.9);
-            border-top: 1px solid var(--border-color);
-            padding: 16px 16px 28px 16px;
-            backdrop-filter: blur(30px);
-        }
-
-        .action-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-
-        .action-grid button {
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 14px 10px;
-            border-radius: 14px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .action-grid button:active {
-            transform: scale(0.95);
-            background: rgba(255, 255, 255, 0.05);
-            border-color: var(--accent-solid);
-        }
-
-        .action-grid button span {
-            font-size: 10px;
-            color: var(--system-green);
-            font-weight: 400;
-        }
-
-        .input-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .input-row input {
-            flex: 1;
-            height: 48px;
-            padding: 0 20px;
-            border-radius: 24px;
-            border: 1px solid var(--border-color);
-            background: rgba(255, 255, 255, 0.03);
-            color: #fff;
-            font-size: 15px;
-            outline: none;
-            transition: all 0.2s;
-        }
-
-        .input-row input:focus {
-            border-color: rgba(255, 0, 85, 0.4);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .action-btn {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: none;
-            background: var(--accent-glow);
-            color: #fff;
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(255, 0, 85, 0.3);
-        }
+        :root { --bg: #0b0b12; --panel: #151520; --accent: #e94560; --green: #00e676; --text: #eee; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: -apple-system, sans-serif; }
+        body { background:var(--bg); color:var(--text); height:100vh; display:flex; flex-direction:column; }
+        .header { padding:16px; text-align:center; font-size:18px; font-weight:700; border-bottom:1px solid #222; }
+        .chat { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; }
+        .msg { max-width:85%; padding:10px 14px; border-radius:14px; font-size:14px; line-height:1.4; animation: fadeIn .2s; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+        .msg.user { background:#1e3a5f; align-self:flex-end; border-bottom-right-radius:4px; }
+        .msg.bot { background:var(--panel); align-self:flex-start; border-bottom-left-radius:4px; }
+        .actions { display:flex; flex-wrap:wrap; gap:8px; padding:12px; }
+        .actions button { background:#1f1f30; color:var(--green); border:none; padding:10px 14px; border-radius:20px; font-size:13px; cursor:pointer; }
+        .input-row { display:flex; gap:8px; padding:0 12px 16px; }
+        .input-row input { flex:1; padding:14px; border-radius:24px; border:none; background:#1f1f30; color:#fff; font-size:15px; }
+        .input-row button { width:48px; height:48px; border-radius:50%; border:none; background:var(--accent); color:#fff; font-size:18px; cursor:pointer; }
     </style>
 </head>
 <body>
-
-    <div class="app-bar">
-        <h1>Slimnyan Cloud Console</h1>
+    <div class="header">🚀 Slimnyan Console</div>
+    <div class="chat" id="chat">
+        <div class="msg bot">✅ Подключено к боту!</div>
+        <div class="msg bot">💡 Команды: мяу, баланс, ты кто, ракета 100, рул кра 500</div>
     </div>
-
-    <div class="terminal-screen" id="screen">
-        <div class="bubble bot">⚡ Консоль подключена к боту. Пиши команды!</div>
-        <div class="bubble bot">💡 Команды: мяу, баланс, ты кто, топмяу, ракета 100, рул кра 500</div>
+    <div class="actions">
+        <button onclick="sendCmd('мяу')">🐾 Мяу</button>
+        <button onclick="sendCmd('баланс')">💗 Баланс</button>
+        <button onclick="sendCmd('ты кто')">👤 Профиль</button>
+        <button onclick="sendCmd('ракета 100')">🚀 Ракета</button>
     </div>
-
-    <div class="controls-area">
-        <div class="action-grid">
-            <button onclick="send('мяу')">🐾 Мяу <span>+баллы</span></button>
-            <button onclick="send('баланс')">💗 Баланс <span>счёт</span></button>
-            <button onclick="send('ты кто')">👤 Профиль <span>инфо</span></button>
-        </div>
-
-        <div class="input-row">
-            <input type="text" id="cmdInput" placeholder="Введите команду..." autofocus>
-            <button class="action-btn" onclick="send()">✦</button>
-        </div>
+    <div class="input-row">
+        <input type="text" id="cmdInput" placeholder="Команда..." autofocus>
+        <button onclick="sendCmd()">▶</button>
     </div>
 
     <script>
@@ -203,38 +44,47 @@
         tg.ready();
         tg.expand();
 
-        const screen = document.getElementById('screen');
+        const chat = document.getElementById('chat');
         const input = document.getElementById('cmdInput');
+        const initData = tg.initData || '';
 
-        function print(text, type) {
+        // Твой ngrok URL
+        const API_URL = 'https://slightly-projector-rigging.ngrok-free.dev/api/command';
+
+        function add(text, type) {
             const div = document.createElement('div');
-            div.className = 'bubble ' + type;
+            div.className = 'msg ' + type;
             div.textContent = text;
-            screen.appendChild(div);
-            screen.scrollTop = screen.scrollHeight;
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
         }
 
-        function send(explicitCmd) {
+        async function sendCmd(explicitCmd) {
             const cmd = explicitCmd || input.value.trim();
             if (!cmd) return;
 
-            print(explicitCmd || input.value, 'user');
+            add(explicitCmd || input.value, 'user');
             if (!explicitCmd) input.value = '';
 
-            // Отправляем команду в бота через Telegram WebApp API
-            tg.sendData(cmd);
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command: cmd, tg_data: initData })
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    add(data.reply, 'bot');
+                } else {
+                    add('❌ ' + data.message, 'bot');
+                }
+            } catch (e) {
+                add('❌ Ошибка соединения', 'bot');
+            }
         }
 
-        // Отправка по Enter
-        input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') send();
-        });
-
-        // Кнопка закрыть
-        tg.MainButton.setText('Закрыть').show();
-        tg.MainButton.onClick(function() {
-            tg.close();
-        });
+        input.addEventListener('keypress', e => { if (e.key === 'Enter') sendCmd(); });
+        tg.MainButton.setText('Закрыть').show().onClick(() => tg.close());
     </script>
 </body>
 </html>
