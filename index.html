@@ -181,7 +181,7 @@
     </div>
 
     <div class="terminal-screen" id="screen">
-        <div class="bubble bot">⚡ Консоль подключена напрямую к ядру. Команды обрабатываются скрыто, без флуда в чат Телеграма.</div>
+        <div class="bubble bot">⚡ Консоль подключена к ядру бота. Пиши команды!</div>
     </div>
 
     <div class="controls-area">
@@ -203,8 +203,6 @@
         tg.expand();
 
         const initData = tg.initData || "";
-
-        // ВАЖНО: Здесь URL твоего хостинга
         const BACKEND_URL = 'https://slimnyanbot.nomadhost.pp.ua/api/command';
 
         const screen = document.getElementById('screen');
@@ -246,17 +244,17 @@
                 if (data.status === 'success') {
                     print(data.reply, 'bot');
                 } else {
-                    print('❌ Ошибка сервера: ' + data.message, 'bot');
+                    print('❌ ' + data.message, 'bot');
                 }
 
             } catch (err) {
                 loader.remove();
-                print('❌ Не удалось связаться с хостингом бота. Проверь BACKEND_URL.', 'bot');
+                print('❌ Сервер недоступен', 'bot');
             }
         }
 
         input.addEventListener('keypress', e => { if (e.key === 'Enter') execute(); });
-        tg.MainButton.setText('Закрыть консоль').show().onClick(() => tg.close());
+        tg.MainButton.setText('Закрыть').show().onClick(() => tg.close());
     </script>
 </body>
 </html>
