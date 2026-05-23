@@ -48,8 +48,8 @@
         const input = document.getElementById('cmdInput');
         const initData = tg.initData || '';
 
-        // Твой ngrok URL
-        const API_URL = 'https://slightly-projector-rigging.ngrok-free.dev/api/command';
+        // Автоматически используем сохранённый URL или дефолтный
+        let API_URL = localStorage.getItem('ngrok_url') || 'https://slightly-projector-rigging.ngrok-free.dev/api/command';
 
         function add(text, type) {
             const div = document.createElement('div');
