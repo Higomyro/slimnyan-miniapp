@@ -23,7 +23,6 @@
         @keyframes fadeIn { to { transform:translateY(0); opacity:1; } }
         .msg.user { background:linear-gradient(135deg,#254b7d,#1a3356); align-self:flex-end; }
         .msg.bot { background:var(--panel); align-self:flex-start; }
-        .msg.rocket { background:linear-gradient(145deg,#1d0b2e,#11051c); border:1px solid var(--accent); box-shadow:0 0 15px rgba(255,42,95,0.4); align-self:center; text-align:center; width:90%; white-space:pre-line; }
         .actions { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; padding:12px; background:rgba(19,19,34,0.4); border-top:1px solid rgba(255,255,255,0.03); }
         .actions button { background:var(--panel); color:#fff; border:1px solid rgba(255,255,255,0.05); padding:12px 8px; border-radius:14px; font-size:13px; font-weight:600; cursor:pointer; }
         .actions button:active { transform:scale(0.92); }
@@ -31,31 +30,24 @@
         .input-row { display:flex; gap:8px; background:var(--panel); padding:6px 6px 6px 16px; border-radius:30px; border:1px solid rgba(255,255,255,0.05); align-items:center; }
         .input-row input { flex:1; border:none; background:transparent; color:#fff; font-size:15px; outline:none; }
         .input-row button { width:40px; height:40px; border-radius:50%; border:none; background:var(--accent); color:#fff; font-size:16px; cursor:pointer; }
-        .cashout-btn { background:linear-gradient(90deg,#00ff88,#00e676); color:#000; padding:14px; border:none; border-radius:14px; font-size:16px; font-weight:800; cursor:pointer; width:100%; margin-top:8px; }
-        .skip-btn { background:transparent; color:#ffaa00; border:1px solid #ffaa00; padding:10px; border-radius:14px; font-size:14px; cursor:pointer; width:100%; margin-top:4px; }
-        #rocketBetRow { margin-bottom:10px; }
-        #rocketBetRow button { background:var(--blue); }
     </style>
 </head>
 <body>
     <div class="header">🐾 Nyanbot <span>(miniapp)</span></div>
     
     <div class="chat" id="chat">
-        <div class="msg bot">⚡ Подключаюсь к боту...</div>
+        <div class="msg bot">✅ Подключено к системе Nyanbot!</div>
+        <div class="msg bot">💡 Команды: мяу, баланс, ты кто, ракета 100, рул кра 500</div>
     </div>
     
     <div class="actions">
         <button onclick="sendCmd('мяу')">🐾Мяу</button>
         <button onclick="sendCmd('баланс')">💗Баланс</button>
         <button onclick="sendCmd('ты кто')">👤Профиль</button>
-        <button onclick="startRocket()">🚀Ракета</button>
+        <button onclick="sendCmd('ракета 100')">🚀Ракета</button>
     </div>
     
     <div class="input-container">
-        <div class="input-row" id="rocketBetRow" style="display:none;">
-            <input type="number" id="betInput" placeholder="Сумма ставки..." value="100">
-            <button onclick="launchRocket()">🚀</button>
-        </div>
         <div class="input-row">
             <input type="text" id="cmdInput" placeholder="Введите команду..." autofocus>
             <button onclick="sendCmd()">➔</button>
@@ -76,39 +68,15 @@
             div.className = 'msg ' + type;
             div.textContent = text;
             chat.appendChild(div);
-            setTimeout(() => { chat.scrollTop = chat.scrollHeight; }, 50);
-            return div;
+            chat.scrollTop = chat.scrollHeight;
         }
-
-        // При загрузке запрашиваем меню
-        function loadMenu() {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', API_URL, true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    const data = JSON.parse(xhr.responseText);
-                    if (data.reply) {
-                        // Очищаем первое сообщение и показываем меню
-                        chat.innerHTML = '';
-                        add(data.reply, 'bot');
-                    } else {
-                        add('✅ Подключено к системе Nyanbot!', 'bot');
-                        add('💡 Команды: мяу, баланс, ты кто, ракета 100, рул кра 500', 'bot');
-                    }
-                }
-            };
-            xhr.send(JSON.stringify({ command: '/start', tg_data: initData }));
-        }
-
-        // Загружаем меню при входе
-        loadMenu();
 
         function sendCmd(explicitCmd) {
             const cmd = explicitCmd || input.value.trim();
             if (!cmd) return;
             add(cmd, 'user');
             if (!explicitCmd) input.value = '';
+
             const xhr = new XMLHttpRequest();
             xhr.open('POST', API_URL, true);
             xhr.setRequestHeader('Content-Type', 'application/json');
@@ -120,122 +88,6 @@
             };
             xhr.onerror = function() { add('❌ Ошибка сети', 'bot'); };
             xhr.send(JSON.stringify({ command: cmd, tg_data: initData }));
-        }
-
-        let rocketMsg = null;
-        let rocketInterval = null;
-
-        function startRocket() {
-            const row = document.getElementById('rocketBetRow');
-            row.style.display = row.style.display === 'flex' ? 'none' : 'flex';
-        }
-
-        function launchRocket() {
-            const bet = parseInt(document.getElementById('betInput').value) || 100;
-            document.getElementById('rocketBetRow').style.display = 'none';
-            
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', API_URL, true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.onload = function() {
-                const data = JSON.parse(xhr.responseText);
-                if (data.status === 'success' && data.game) {
-                    rocketMsg = add(
-                        '🚀 Ракета взлетает!\n\n🟢 Шанс: 97%\n\n💰 Ставка: ' + bet + '🪙\n📈 x1.00\n💎 ' + bet + '🪙',
-                        'rocket'
-                    );
-                    
-                    const cashoutBtn = document.createElement('button');
-                    cashoutBtn.className = 'cashout-btn';
-                    cashoutBtn.textContent = '💰 ЗАБРАТЬ ВЫИГРЫШ';
-                    cashoutBtn.onclick = cashoutRocket;
-                    rocketMsg.appendChild(cashoutBtn);
-                    
-                    updateRocketState(bet);
-                } else {
-                    add('❌ ' + (data.message || 'Ошибка'), 'bot');
-                }
-            };
-            xhr.send(JSON.stringify({ action: 'rocket_start', bet: bet, tg_data: initData }));
-        }
-
-        function updateRocketState(bet) {
-            if (rocketInterval) clearInterval(rocketInterval);
-            
-            rocketInterval = setInterval(() => {
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', API_URL, true);
-                xhr.setRequestHeader('Content-Type', 'application/json');
-                xhr.onload = function() {
-                    const data = JSON.parse(xhr.responseText);
-                    if (!rocketMsg) { clearInterval(rocketInterval); return; }
-                    
-                    if (data.status === 'success' && data.active && !data.cashed_out) {
-                        const mult = data.multiplier;
-                        const pot = data.potential || Math.floor(bet * mult);
-                        rocketMsg.childNodes[0].textContent =
-                            '🚀 Ракета взлетает!\n\n🟢 Шанс: ' + (mult < 1.5 ? 97 : mult < 2.5 ? 82 : 50) + '%\n\n💰 Ставка: ' + bet + '🪙\n📈 x' + mult + '\n💎 ' + pot + '🪙';
-                    } else if (!data.active || data.cashed_out) {
-                        clearInterval(rocketInterval);
-                        const oldBtns = rocketMsg.querySelectorAll('button');
-                        oldBtns.forEach(b => b.remove());
-                        
-                        if (data.cashed_out) {
-                            const winnings = data.winnings || 0;
-                            const cashoutMult = data.cashout_multiplier || data.multiplier || 1;
-                            const crashMult = data.multiplier || cashoutMult;
-                            rocketMsg.childNodes[0].textContent =
-                                '✅ СНЯТО НА x' + cashoutMult + '!\n💰 Выигрыш: ' + winnings + '🪙\n📈 Ракета взорвалась на x' + crashMult;
-                            
-                            const skipBtn = document.createElement('button');
-                            skipBtn.className = 'skip-btn';
-                            skipBtn.textContent = '⏭ ПРОПУСТИТЬ';
-                            skipBtn.onclick = function() {
-                                rocketMsg.childNodes[0].textContent = '⏭ Пропущено\n💰 Выигрыш: ' + winnings + '🪙';
-                                const btns = rocketMsg.querySelectorAll('button');
-                                btns.forEach(b => b.remove());
-                                rocketMsg = null;
-                            };
-                            rocketMsg.appendChild(skipBtn);
-                        } else {
-                            rocketMsg.childNodes[0].textContent =
-                                '💥 РАКЕТА ВЗОРВАЛАСЬ НА x' + (data.multiplier || 1) + '!\n😢 Ставка ' + bet + '🪙 сгорела';
-                            rocketMsg = null;
-                        }
-                    }
-                };
-                xhr.send(JSON.stringify({ action: 'rocket_state', tg_data: initData }));
-            }, 600);
-        }
-
-        function cashoutRocket() {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', API_URL, true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.onload = function() {
-                const data = JSON.parse(xhr.responseText);
-                if (data.status === 'success' && rocketMsg) {
-                    const mult = data.multiplier || 1;
-                    const winnings = data.winnings || 0;
-                    const oldBtns = rocketMsg.querySelectorAll('button');
-                    oldBtns.forEach(b => b.remove());
-                    rocketMsg.childNodes[0].textContent =
-                        '✅ СНЯТО НА x' + mult + '!\n💰 Выигрыш: ' + winnings + '🪙\nРакета ещё летит...';
-                    
-                    const skipBtn = document.createElement('button');
-                    skipBtn.className = 'skip-btn';
-                    skipBtn.textContent = '⏭ ПРОПУСТИТЬ';
-                    skipBtn.onclick = function() {
-                        rocketMsg.childNodes[0].textContent = '⏭ Пропущено\n💰 Выигрыш: ' + winnings + '🪙';
-                        const btns = rocketMsg.querySelectorAll('button');
-                        btns.forEach(b => b.remove());
-                        rocketMsg = null;
-                        clearInterval(rocketInterval);
-                    };
-                    rocketMsg.appendChild(skipBtn);
-                }
-            };
-            xhr.send(JSON.stringify({ action: 'rocket_cashout', tg_data: initData }));
         }
 
         input.addEventListener('keypress', e => { if (e.key === 'Enter') sendCmd(); });
