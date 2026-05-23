@@ -48,8 +48,8 @@
         const input = document.getElementById('cmdInput');
         const initData = tg.initData || '';
 
-        // Автоматически используем сохранённый URL или дефолтный
-    const API_URL = 'https://slightly-projector-rigging.ngrok-free.dev/api/command';
+        // Используем bore (HTTP)
+        const API_URL = 'http://bore.pub:32065/api/command';
 
         function add(text, type) {
             const div = document.createElement('div');
