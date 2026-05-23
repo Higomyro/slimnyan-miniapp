@@ -69,7 +69,7 @@
             font-size: 14px;
             line-height: 1.45;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            animation: cubic-bezier(0.1, 1, 0.1, 1) bounceIn 0.4s;
+            animation: bounceIn 0.4s ease;
         }
 
         @keyframes bounceIn {
@@ -181,19 +181,19 @@
     </div>
 
     <div class="terminal-screen" id="screen">
-        <div class="bubble bot">⚡ Консоль подключена к ядру бота. Пиши команды!</div>
+        <div class="bubble bot">⚡ Консоль подключена к боту. Пиши команды!</div>
     </div>
 
     <div class="controls-area">
         <div class="action-grid">
-            <button onclick="execute('мяу')">🐾 Мяу <span>+баллы</span></button>
-            <button onclick="execute('баланс')">💗 Баланс <span>счёт</span></button>
-            <button onclick="execute('ты кто')">👤 Профиль <span>инфо</span></button>
+            <button onclick="send('мяу')">🐾 Мяу <span>+баллы</span></button>
+            <button onclick="send('баланс')">💗 Баланс <span>счёт</span></button>
+            <button onclick="send('ты кто')">👤 Профиль <span>инфо</span></button>
         </div>
 
         <div class="input-row">
-            <input type="text" id="cmdInput" placeholder="Введите команду...">
-            <button class="action-btn" onclick="execute()">✦</button>
+            <input type="text" id="cmdInput" placeholder="Введите команду..." autofocus>
+            <button class="action-btn" onclick="send()">✦</button>
         </div>
     </div>
 
@@ -201,9 +201,6 @@
         const tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
-
-        const initData = tg.initData || "";
-        const BACKEND_URL = 'https://slimnyanbot.nomadhost.pp.ua/api/command';
 
         const screen = document.getElementById('screen');
         const input = document.getElementById('cmdInput');
@@ -216,45 +213,27 @@
             screen.scrollTop = screen.scrollHeight;
         }
 
-        async function execute(explicitCmd) {
+        function send(explicitCmd) {
             const cmd = explicitCmd || input.value.trim();
             if (!cmd) return;
 
             print(cmd, 'user');
             if (!explicitCmd) input.value = '';
 
-            const loader = document.createElement('div');
-            loader.className = 'bubble bot';
-            loader.textContent = '● ● ●';
-            screen.appendChild(loader);
-
-            try {
-                const response = await fetch(BACKEND_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        command: cmd,
-                        tg_data: initData
-                    })
-                });
-
-                const data = await response.json();
-                loader.remove();
-
-                if (data.status === 'success') {
-                    print(data.reply, 'bot');
-                } else {
-                    print('❌ ' + data.message, 'bot');
-                }
-
-            } catch (err) {
-                loader.remove();
-                print('❌ Сервер недоступен', 'bot');
-            }
+            // Отправляем команду в бота через Telegram WebApp API
+            tg.sendData(cmd);
         }
 
-        input.addEventListener('keypress', e => { if (e.key === 'Enter') execute(); });
-        tg.MainButton.setText('Закрыть').show().onClick(() => tg.close());
+        // Отправка по Enter
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') send();
+        });
+
+        // Кнопка закрыть
+        tg.MainButton.setText('Закрыть').show();
+        tg.MainButton.onClick(function() {
+            tg.close();
+        });
     </script>
 </body>
 </html>
