@@ -1,5 +1,681 @@
-/* ЗАМЕНИ ПОЛНОСТЬЮ ВЕСЬ БЛОК ROCKET НА ЭТО */
-/* ТУТ ПОЧИНЕН skip/progress/cashout */
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+maximum-scale=1.0,
+user-scalable=no">
+
+<title>Nyanbot</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+    --bg:#05060a;
+
+    --panel:rgba(18,18,30,.72);
+
+    --accent:#ff2b75;
+    --accent2:#ff5e96;
+
+    --blue:#00d9ff;
+    --green:#00ffb3;
+    --purple:#8b5cf6;
+
+    --text:#fff;
+    --sub:#8d92aa;
+
+    --border:rgba(255,255,255,.06);
+
+    --shadow:
+        0 20px 60px rgba(0,0,0,.45);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+
+    font-family:'Inter',sans-serif;
+
+    -webkit-tap-highlight-color:transparent;
+}
+
+body{
+    height:100vh;
+    overflow:hidden;
+
+    display:flex;
+    flex-direction:column;
+
+    color:white;
+
+    background:
+        radial-gradient(circle at top left,
+        rgba(255,43,117,.18),
+        transparent 28%),
+
+        radial-gradient(circle at top right,
+        rgba(0,217,255,.15),
+        transparent 28%),
+
+        radial-gradient(circle at bottom,
+        rgba(139,92,246,.15),
+        transparent 35%),
+
+        var(--bg);
+}
+
+/* BG */
+
+.grid{
+    position:fixed;
+    inset:0;
+
+    background-image:
+        linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+
+    background-size:40px 40px;
+
+    z-index:-2;
+}
+
+.blur{
+    position:fixed;
+
+    border-radius:50%;
+
+    filter:blur(120px);
+
+    opacity:.18;
+
+    z-index:-1;
+
+    animation:float 12s ease-in-out infinite;
+}
+
+.blur1{
+    width:260px;
+    height:260px;
+
+    background:#ff2b75;
+
+    top:-120px;
+    left:-100px;
+}
+
+.blur2{
+    width:260px;
+    height:260px;
+
+    background:#00d9ff;
+
+    right:-100px;
+    bottom:-120px;
+}
+
+@keyframes float{
+    0%,100%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-25px);
+    }
+}
+
+/* HEADER */
+
+.header{
+    padding:18px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    backdrop-filter:blur(20px);
+
+    background:
+        rgba(10,10,18,.72);
+
+    border-bottom:
+        1px solid rgba(255,255,255,.05);
+}
+
+.header-left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.logo{
+    width:52px;
+    height:52px;
+
+    border-radius:18px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:24px;
+
+    background:
+        linear-gradient(145deg,
+        var(--accent),
+        var(--purple));
+
+    box-shadow:
+        0 0 40px rgba(255,43,117,.35);
+}
+
+.logo-text h1{
+    font-size:18px;
+    font-weight:900;
+}
+
+.logo-text p{
+    font-size:12px;
+    color:var(--sub);
+
+    margin-top:3px;
+}
+
+.online{
+    padding:10px 15px;
+
+    border-radius:18px;
+
+    background:
+        rgba(255,255,255,.05);
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    color:var(--green);
+
+    font-size:13px;
+    font-weight:700;
+}
+
+/* CHAT */
+
+.chat{
+    flex:1;
+
+    overflow-y:auto;
+
+    padding:18px;
+
+    display:flex;
+    flex-direction:column;
+
+    gap:16px;
+
+    scroll-behavior:smooth;
+}
+
+.chat::-webkit-scrollbar{
+    width:0;
+}
+
+.msg{
+    max-width:86%;
+
+    padding:16px 18px;
+
+    border-radius:28px;
+
+    line-height:1.5;
+
+    font-size:14.5px;
+
+    position:relative;
+
+    overflow:hidden;
+
+    word-wrap:break-word;
+    overflow-wrap:break-word;
+
+    white-space:pre-wrap;
+
+    animation:show .25s ease;
+
+    box-shadow:var(--shadow);
+}
+
+@keyframes show{
+    from{
+        opacity:0;
+        transform:
+            translateY(12px)
+            scale(.98);
+    }
+
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+
+.msg.bot{
+    align-self:flex-start;
+
+    background:
+        linear-gradient(145deg,
+        rgba(24,24,40,.9),
+        rgba(12,12,20,.92));
+
+    border:
+        1px solid rgba(255,255,255,.06);
+}
+
+.msg.user{
+    align-self:flex-end;
+
+    background:
+        linear-gradient(145deg,
+        #2563eb,
+        #1d4ed8);
+}
+
+.msg.rocket{
+    width:100%;
+
+    text-align:center;
+
+    padding:24px;
+
+    border-radius:34px;
+
+    background:
+        linear-gradient(145deg,
+        rgba(30,10,40,.96),
+        rgba(15,6,20,.98));
+
+    border:
+        1px solid rgba(255,43,117,.25);
+
+    display:flex;
+    flex-direction:column;
+
+    align-items:center;
+
+    gap:12px;
+}
+
+.rocket-title{
+    font-size:20px;
+    font-weight:900;
+
+    background:
+        linear-gradient(90deg,
+        #ff2b75,
+        #ff8fb5);
+
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.rocket-mult{
+    font-size:38px;
+    font-weight:900;
+}
+
+.rocket-win{
+    font-size:22px;
+    font-weight:800;
+
+    color:var(--green);
+}
+
+.rocket-loss{
+    font-size:22px;
+    font-weight:800;
+
+    color:#ff5b81;
+}
+
+/* BOTTOM */
+
+.bottom{
+    padding:14px;
+
+    background:
+        rgba(8,8,14,.82);
+
+    backdrop-filter:blur(20px);
+
+    border-top:
+        1px solid rgba(255,255,255,.05);
+}
+
+/* ACTIONS */
+
+.actions{
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:12px;
+
+    margin-bottom:14px;
+}
+
+.actions button{
+    border:none;
+
+    border-radius:22px;
+
+    padding:15px;
+
+    background:
+        linear-gradient(145deg,
+        rgba(255,255,255,.06),
+        rgba(255,255,255,.03));
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    color:white;
+
+    font-size:14px;
+    font-weight:800;
+
+    cursor:pointer;
+}
+
+.actions button:active{
+    transform:scale(.95);
+}
+
+/* INPUT */
+
+.input-wrap{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.input-row{
+    display:flex;
+    align-items:center;
+
+    gap:10px;
+
+    padding:8px 8px 8px 18px;
+
+    border-radius:28px;
+
+    background:
+        linear-gradient(145deg,
+        rgba(255,255,255,.06),
+        rgba(255,255,255,.03));
+
+    border:
+        1px solid rgba(255,255,255,.08);
+}
+
+.input-row input{
+    flex:1;
+
+    border:none;
+    outline:none;
+
+    background:none;
+
+    color:white;
+
+    font-size:15px;
+}
+
+.input-row input::placeholder{
+    color:#7d8298;
+}
+
+.send-btn{
+    width:50px;
+    height:50px;
+
+    border:none;
+
+    border-radius:20px;
+
+    background:
+        linear-gradient(145deg,
+        var(--accent),
+        var(--accent2));
+
+    color:white;
+
+    font-size:18px;
+
+    cursor:pointer;
+}
+
+/* BUTTONS */
+
+.cashout-btn,
+.skip-btn{
+    width:100%;
+
+    min-height:54px;
+
+    border:none;
+
+    border-radius:20px;
+
+    font-size:15px;
+    font-weight:800;
+
+    cursor:pointer;
+}
+
+.cashout-btn{
+    background:
+        linear-gradient(145deg,
+        var(--green),
+        #00d48f);
+
+    color:black;
+}
+
+.skip-btn{
+    background:
+        rgba(255,255,255,.06);
+
+    color:#ffc85e;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="grid"></div>
+
+<div class="blur blur1"></div>
+<div class="blur blur2"></div>
+
+<div class="header">
+
+    <div class="header-left">
+
+        <div class="logo">
+            🐾
+        </div>
+
+        <div class="logo-text">
+            <h1>Nyanbot</h1>
+            <p>modern miniapp ui</p>
+        </div>
+
+    </div>
+
+    <div class="online">
+        💎 online
+    </div>
+
+</div>
+
+<div class="chat" id="chat">
+
+    <div class="msg bot">
+        ⚡ Подключение...
+    </div>
+
+</div>
+
+<div class="bottom">
+
+    <div class="actions">
+
+        <button onclick="sendCmd('мяу')">
+            🐾 Мяу
+        </button>
+
+        <button onclick="sendCmd('баланс')">
+            💰 Баланс
+        </button>
+
+        <button onclick="startRocket()">
+            🚀 Ракета
+        </button>
+
+    </div>
+
+    <div class="input-wrap">
+
+        <div class="input-row"
+        id="rocketBetRow"
+        style="display:none;">
+
+            <input
+            type="number"
+            id="betInput"
+            placeholder="Ставка..."
+            value="100">
+
+            <button
+            class="send-btn"
+            onclick="launchRocket()">
+                🚀
+            </button>
+
+        </div>
+
+        <div class="input-row">
+
+            <input
+            type="text"
+            id="cmdInput"
+            placeholder="Введите команду..."
+            autofocus>
+
+            <button
+            class="send-btn"
+            onclick="sendCmd()">
+                ➜
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const tg = window.Telegram.WebApp;
+
+tg.ready();
+tg.expand();
+
+const chat =
+document.getElementById('chat');
+
+const input =
+document.getElementById('cmdInput');
+
+const initData =
+tg.initData || '';
+
+const API_URL =
+'https://slightly-projector-rigging.ngrok-free.dev/api/command';
+
+function add(text,type){
+
+    const div =
+    document.createElement('div');
+
+    div.className =
+    'msg ' + type;
+
+    div.innerHTML = text;
+
+    chat.appendChild(div);
+
+    chat.scrollTop =
+    chat.scrollHeight;
+
+    return div;
+}
+
+function sendCmd(explicitCmd){
+
+    const cmd =
+    explicitCmd ||
+    input.value.trim();
+
+    if(!cmd) return;
+
+    add(cmd,'user');
+
+    input.value = '';
+
+    const xhr =
+    new XMLHttpRequest();
+
+    xhr.open(
+    'POST',
+    API_URL,
+    true
+    );
+
+    xhr.setRequestHeader(
+    'Content-Type',
+    'application/json'
+    );
+
+    xhr.onload = function(){
+
+        const data =
+        JSON.parse(xhr.responseText);
+
+        if(data.reply){
+
+            add(
+            data.reply,
+            'bot'
+            );
+        }
+    };
+
+    xhr.send(JSON.stringify({
+        command:cmd,
+        tg_data:initData
+    }));
+}
+
+/* ROCKET */
 
 let rocketMsg = null;
 let rocketInterval = null;
@@ -7,78 +683,157 @@ let rocketInterval = null;
 function startRocket(){
 
     const row =
-        document.getElementById('rocketBetRow');
+    document.getElementById(
+    'rocketBetRow'
+    );
 
     row.style.display =
-        row.style.display === 'flex'
-            ? 'none'
-            : 'flex';
+    row.style.display === 'flex'
+    ? 'none'
+    : 'flex';
+}
+
+function rocketHTML(type,data={}){
+
+    if(type === 'flying'){
+
+        return `
+<div class="rocket-title">
+🚀 РАКЕТА ЛЕТИТ
+</div>
+
+<div class="rocket-mult">
+x${data.mult}
+</div>
+
+<div>
+💰 Ставка: ${data.bet}🪙
+</div>
+
+<div>
+🟢 Шанс: ${data.chance}%
+</div>
+
+<div class="rocket-win">
+💎 ${data.pot}🪙
+</div>
+`;
+    }
+
+    if(type === 'cashout'){
+
+        return `
+<div class="rocket-title">
+✅ ВЫИГРЫШ ЗАБРАН
+</div>
+
+<div class="rocket-mult">
+x${data.mult}
+</div>
+
+<div class="rocket-win">
+💰 ${data.win}🪙
+</div>
+
+<div>
+🚀 Ракета ещё летит...
+</div>
+`;
+    }
+
+    if(type === 'lost'){
+
+        return `
+<div class="rocket-title">
+💥 РАКЕТА ВЗОРВАЛАСЬ
+</div>
+
+<div class="rocket-loss">
+-${data.bet}🪙
+</div>
+
+<div>
+😢 Ставка сгорела
+</div>
+`;
+    }
+
+    if(type === 'skip'){
+
+        return `
+<div class="rocket-title">
+⏭ ПРОПУЩЕНО
+</div>
+
+<div class="rocket-win">
+💰 ${data.win}🪙
+</div>
+`;
+    }
 }
 
 function launchRocket(){
 
     const bet =
-        parseInt(
-            document.getElementById('betInput').value
-        ) || 100;
+    parseInt(
+    document.getElementById(
+    'betInput'
+    ).value
+    ) || 100;
 
     document.getElementById(
-        'rocketBetRow'
+    'rocketBetRow'
     ).style.display = 'none';
 
-    const xhr = new XMLHttpRequest();
+    const xhr =
+    new XMLHttpRequest();
 
-    xhr.open('POST', API_URL, true);
+    xhr.open(
+    'POST',
+    API_URL,
+    true
+    );
 
     xhr.setRequestHeader(
-        'Content-Type',
-        'application/json'
+    'Content-Type',
+    'application/json'
     );
 
     xhr.onload = function(){
 
         const data =
-            JSON.parse(xhr.responseText);
+        JSON.parse(xhr.responseText);
 
         if(data.status === 'success'
-            && data.game){
+        && data.game){
 
             rocketMsg = add(
-`🚀 РАКЕТА ВЗЛЕТАЕТ
-
-💰 Ставка: ${bet}🪙
-
-📈 x1.00
-🟢 Шанс: 97%
-
-💎 Потенциал растёт...`,
-'rocket');
-
-            const cashoutBtn =
-                document.createElement('button');
-
-            cashoutBtn.className =
-                'cashout-btn';
-
-            cashoutBtn.textContent =
-                '💰 ЗАБРАТЬ ВЫИГРЫШ';
-
-            cashoutBtn.onclick =
-                cashoutRocket;
-
-            rocketMsg.appendChild(
-                cashoutBtn
+            rocketHTML(
+            'flying',
+            {
+                mult:'1.00',
+                bet:bet,
+                chance:97,
+                pot:bet
+            }),
+            'rocket'
             );
+
+            const btn =
+            document.createElement('button');
+
+            btn.className =
+            'cashout-btn';
+
+            btn.innerText =
+            '💰 ЗАБРАТЬ';
+
+            btn.onclick =
+            cashoutRocket;
+
+            rocketMsg.appendChild(btn);
 
             updateRocketState(bet);
-
-        }else{
-
-            add(
-                '❌ ' +
-                (data.message || 'Ошибка'),
-                'bot'
-            );
         }
     };
 
@@ -92,160 +847,129 @@ function launchRocket(){
 function updateRocketState(bet){
 
     if(rocketInterval){
-        clearInterval(rocketInterval);
+
+        clearInterval(
+        rocketInterval
+        );
     }
 
-    rocketInterval = setInterval(()=>{
+    rocketInterval =
+    setInterval(()=>{
 
         const xhr =
-            new XMLHttpRequest();
+        new XMLHttpRequest();
 
         xhr.open(
-            'POST',
-            API_URL,
-            true
+        'POST',
+        API_URL,
+        true
         );
 
         xhr.setRequestHeader(
-            'Content-Type',
-            'application/json'
+        'Content-Type',
+        'application/json'
         );
 
         xhr.onload = function(){
 
             const data =
-                JSON.parse(xhr.responseText);
+            JSON.parse(xhr.responseText);
 
-            if(!rocketMsg){
-
-                clearInterval(
-                    rocketInterval
-                );
-
-                return;
-            }
+            if(!rocketMsg) return;
 
             if(
-                data.status === 'success'
-                &&
-                data.active
-                &&
-                !data.cashed_out
+            data.active &&
+            !data.cashed_out
             ){
 
                 const mult =
-                    data.multiplier || 1;
+                data.multiplier || 1;
 
                 const pot =
-                    data.potential ||
-                    Math.floor(
-                        bet * mult
-                    );
+                Math.floor(
+                bet * mult
+                );
 
                 const chance =
-                    mult < 1.5 ? 97 :
-                    mult < 2.5 ? 82 :
-                    mult < 4 ? 55 :
-                    30;
+                mult < 1.5 ? 97 :
+                mult < 2.5 ? 82 :
+                mult < 4 ? 55 :
+                30;
 
                 rocketMsg.innerHTML =
-`
-🚀 РАКЕТА ВЗЛЕТАЕТ<br><br>
+                rocketHTML(
+                'flying',
+                {
+                    mult:mult,
+                    bet:bet,
+                    chance:chance,
+                    pot:pot
+                });
 
-🟢 Шанс: ${chance}%<br><br>
+                const btn =
+                document.createElement('button');
 
-💰 Ставка: ${bet}🪙<br><br>
+                btn.className =
+                'cashout-btn';
 
-📈 x${mult}<br>
-💎 ${pot}🪙
-`;
+                btn.innerText =
+                '💰 ЗАБРАТЬ';
 
-                const cashoutBtn =
-                    document.createElement('button');
+                btn.onclick =
+                cashoutRocket;
 
-                cashoutBtn.className =
-                    'cashout-btn';
-
-                cashoutBtn.textContent =
-                    '💰 ЗАБРАТЬ ВЫИГРЫШ';
-
-                cashoutBtn.onclick =
-                    cashoutRocket;
-
-                rocketMsg.appendChild(
-                    cashoutBtn
-                );
+                rocketMsg.appendChild(btn);
 
             }else{
 
                 clearInterval(
-                    rocketInterval
+                rocketInterval
                 );
 
                 if(data.cashed_out){
 
-                    const winnings =
-                        data.winnings || 0;
-
-                    const mult =
-                        data.cashout_multiplier
-                        ||
-                        data.multiplier
-                        ||
-                        1;
-
                     rocketMsg.innerHTML =
-`
-✅ СНЯТО НА x${mult}<br><br>
+                    rocketHTML(
+                    'cashout',
+                    {
+                        mult:
+                        data.multiplier || 1,
 
-💰 Выигрыш: ${winnings}🪙<br><br>
+                        win:
+                        data.winnings || 0
+                    });
 
-🚀 Ракета ещё летит...
-`;
+                    const skip =
+                    document.createElement('button');
 
-                    const skipBtn =
-                        document.createElement('button');
+                    skip.className =
+                    'skip-btn';
 
-                    skipBtn.className =
-                        'skip-btn';
+                    skip.innerText =
+                    '⏭ ПРОПУСТИТЬ';
 
-                    skipBtn.textContent =
-                        '⏭ ПРОПУСТИТЬ';
-
-                    skipBtn.onclick = function(){
+                    skip.onclick =
+                    function(){
 
                         rocketMsg.innerHTML =
-`
-⏭ ПРОПУЩЕНО<br><br>
-
-💰 Выигрыш: ${winnings}🪙
-`;
-
-                        clearInterval(
-                            rocketInterval
-                        );
-
-                        setTimeout(()=>{
-                            rocketMsg = null;
-                        },300);
+                        rocketHTML(
+                        'skip',
+                        {
+                            win:
+                            data.winnings || 0
+                        });
                     };
 
-                    rocketMsg.appendChild(
-                        skipBtn
-                    );
+                    rocketMsg.appendChild(skip);
 
                 }else{
 
                     rocketMsg.innerHTML =
-`
-💥 РАКЕТА ВЗОРВАЛАСЬ<br><br>
-
-😢 Ставка ${bet}🪙 сгорела
-`;
-
-                    setTimeout(()=>{
-                        rocketMsg = null;
-                    },500);
+                    rocketHTML(
+                    'lost',
+                    {
+                        bet:bet
+                    });
                 }
             }
         };
@@ -261,72 +985,60 @@ function updateRocketState(bet){
 function cashoutRocket(){
 
     const xhr =
-        new XMLHttpRequest();
+    new XMLHttpRequest();
 
     xhr.open(
-        'POST',
-        API_URL,
-        true
+    'POST',
+    API_URL,
+    true
     );
 
     xhr.setRequestHeader(
-        'Content-Type',
-        'application/json'
+    'Content-Type',
+    'application/json'
     );
 
     xhr.onload = function(){
 
         const data =
-            JSON.parse(xhr.responseText);
+        JSON.parse(xhr.responseText);
 
         if(data.status === 'success'
-            && rocketMsg){
-
-            const winnings =
-                data.winnings || 0;
-
-            const mult =
-                data.multiplier || 1;
+        && rocketMsg){
 
             rocketMsg.innerHTML =
-`
-✅ СНЯТО НА x${mult}<br><br>
+            rocketHTML(
+            'cashout',
+            {
+                mult:
+                data.multiplier || 1,
 
-💰 Выигрыш: ${winnings}🪙<br><br>
+                win:
+                data.winnings || 0
+            });
 
-🚀 Ракета ещё летит...
-`;
+            const skip =
+            document.createElement('button');
 
-            const skipBtn =
-                document.createElement('button');
+            skip.className =
+            'skip-btn';
 
-            skipBtn.className =
-                'skip-btn';
+            skip.innerText =
+            '⏭ ПРОПУСТИТЬ';
 
-            skipBtn.textContent =
-                '⏭ ПРОПУСТИТЬ';
-
-            skipBtn.onclick = function(){
+            skip.onclick =
+            function(){
 
                 rocketMsg.innerHTML =
-`
-⏭ ПРОПУЩЕНО<br><br>
-
-💰 Выигрыш: ${winnings}🪙
-`;
-
-                clearInterval(
-                    rocketInterval
-                );
-
-                setTimeout(()=>{
-                    rocketMsg = null;
-                },300);
+                rocketHTML(
+                'skip',
+                {
+                    win:
+                    data.winnings || 0
+                });
             };
 
-            rocketMsg.appendChild(
-                skipBtn
-            );
+            rocketMsg.appendChild(skip);
         }
     };
 
@@ -335,3 +1047,17 @@ function cashoutRocket(){
         tg_data:initData
     }));
 }
+
+input.addEventListener(
+'keypress',
+e=>{
+
+    if(e.key === 'Enter'){
+        sendCmd();
+    }
+});
+
+</script>
+
+</body>
+</html>
