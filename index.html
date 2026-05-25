@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+
 <meta name="viewport"
 content="width=device-width,
 initial-scale=1.0,
@@ -12,29 +13,24 @@ user-scalable=no">
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 
 :root{
-    --bg:#05060a;
+    --bg:#0b0d14;
 
-    --panel:rgba(18,18,30,.72);
+    --panel:#171a24;
 
-    --accent:#ff2b75;
-    --accent2:#ff5e96;
+    --accent:#ff2d75;
+    --accent2:#ff5d95;
 
-    --blue:#00d9ff;
     --green:#00ffb3;
-    --purple:#8b5cf6;
 
     --text:#fff;
-    --sub:#8d92aa;
+    --sub:#8e94a9;
 
     --border:rgba(255,255,255,.06);
-
-    --shadow:
-        0 20px 60px rgba(0,0,0,.45);
 }
 
 *{
@@ -47,157 +43,95 @@ user-scalable=no">
     -webkit-tap-highlight-color:transparent;
 }
 
+html,
 body{
-    height:100vh;
+    width:100%;
+    height:100%;
     overflow:hidden;
+}
 
+body{
     display:flex;
     flex-direction:column;
 
-    color:white;
-
     background:
         radial-gradient(circle at top left,
-        rgba(255,43,117,.18),
+        rgba(255,45,117,.12),
         transparent 28%),
 
-        radial-gradient(circle at top right,
-        rgba(0,217,255,.15),
-        transparent 28%),
+        #0b0d14;
 
-        radial-gradient(circle at bottom,
-        rgba(139,92,246,.15),
-        transparent 35%),
-
-        var(--bg);
-}
-
-/* BG */
-
-.grid{
-    position:fixed;
-    inset:0;
-
-    background-image:
-        linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
-
-    background-size:40px 40px;
-
-    z-index:-2;
-}
-
-.blur{
-    position:fixed;
-
-    border-radius:50%;
-
-    filter:blur(120px);
-
-    opacity:.18;
-
-    z-index:-1;
-
-    animation:float 12s ease-in-out infinite;
-}
-
-.blur1{
-    width:260px;
-    height:260px;
-
-    background:#ff2b75;
-
-    top:-120px;
-    left:-100px;
-}
-
-.blur2{
-    width:260px;
-    height:260px;
-
-    background:#00d9ff;
-
-    right:-100px;
-    bottom:-120px;
-}
-
-@keyframes float{
-    0%,100%{
-        transform:translateY(0);
-    }
-
-    50%{
-        transform:translateY(-25px);
-    }
+    color:white;
 }
 
 /* HEADER */
 
 .header{
-    padding:18px;
+    height:76px;
+
+    flex-shrink:0;
+
+    padding:14px 16px;
 
     display:flex;
     align-items:center;
     justify-content:space-between;
 
-    backdrop-filter:blur(20px);
-
     background:
-        rgba(10,10,18,.72);
+        rgba(16,18,28,.92);
 
     border-bottom:
-        1px solid rgba(255,255,255,.05);
+        1px solid var(--border);
 }
 
 .header-left{
     display:flex;
     align-items:center;
-    gap:14px;
+
+    gap:12px;
 }
 
 .logo{
-    width:52px;
-    height:52px;
+    width:46px;
+    height:46px;
 
-    border-radius:18px;
+    border-radius:14px;
 
     display:flex;
     align-items:center;
     justify-content:center;
 
-    font-size:24px;
+    font-size:22px;
 
     background:
         linear-gradient(145deg,
         var(--accent),
-        var(--purple));
-
-    box-shadow:
-        0 0 40px rgba(255,43,117,.35);
+        #7b61ff);
 }
 
 .logo-text h1{
-    font-size:18px;
-    font-weight:900;
+    font-size:17px;
+    font-weight:800;
 }
 
 .logo-text p{
-    font-size:12px;
-    color:var(--sub);
+    margin-top:2px;
 
-    margin-top:3px;
+    font-size:12px;
+
+    color:var(--sub);
 }
 
-.online{
-    padding:10px 15px;
+.status{
+    padding:9px 12px;
 
-    border-radius:18px;
+    border-radius:14px;
 
     background:
-        rgba(255,255,255,.05);
+        rgba(255,255,255,.04);
 
     border:
-        1px solid rgba(255,255,255,.08);
+        1px solid rgba(255,255,255,.05);
 
     color:var(--green);
 
@@ -210,53 +144,48 @@ body{
 .chat{
     flex:1;
 
+    min-height:0;
+
     overflow-y:auto;
 
-    padding:18px;
+    padding:16px;
 
     display:flex;
     flex-direction:column;
 
-    gap:16px;
-
-    scroll-behavior:smooth;
+    gap:10px;
 }
 
 .chat::-webkit-scrollbar{
     width:0;
 }
 
+/* MESSAGE */
+
 .msg{
-    max-width:86%;
+    width:fit-content;
 
-    padding:16px 18px;
+    max-width:84%;
 
-    border-radius:28px;
+    padding:14px 15px;
 
-    line-height:1.5;
+    border-radius:20px;
 
-    font-size:14.5px;
+    font-size:14px;
 
-    position:relative;
+    line-height:1.45;
 
-    overflow:hidden;
-
-    word-wrap:break-word;
-    overflow-wrap:break-word;
+    word-break:break-word;
 
     white-space:pre-wrap;
 
-    animation:show .25s ease;
-
-    box-shadow:var(--shadow);
+    animation:show .18s ease;
 }
 
 @keyframes show{
     from{
         opacity:0;
-        transform:
-            translateY(12px)
-            scale(.98);
+        transform:translateY(8px);
     }
 
     to{
@@ -269,12 +198,10 @@ body{
     align-self:flex-start;
 
     background:
-        linear-gradient(145deg,
-        rgba(24,24,40,.9),
-        rgba(12,12,20,.92));
+        #171a24;
 
     border:
-        1px solid rgba(255,255,255,.06);
+        1px solid rgba(255,255,255,.04);
 }
 
 .msg.user{
@@ -286,78 +213,66 @@ body{
         #1d4ed8);
 }
 
+/* ROCKET */
+
 .msg.rocket{
     width:100%;
+    max-width:100%;
+
+    padding:18px;
+
+    border-radius:24px;
 
     text-align:center;
-
-    padding:24px;
-
-    border-radius:34px;
-
-    background:
-        linear-gradient(145deg,
-        rgba(30,10,40,.96),
-        rgba(15,6,20,.98));
-
-    border:
-        1px solid rgba(255,43,117,.25);
 
     display:flex;
     flex-direction:column;
 
-    align-items:center;
+    gap:6px;
 
-    gap:12px;
+    background:
+        linear-gradient(145deg,
+        #241228,
+        #17101f);
+
+    border:
+        1px solid rgba(255,45,117,.14);
 }
 
 .rocket-title{
-    font-size:20px;
-    font-weight:900;
+    font-size:17px;
+    font-weight:800;
 
-    background:
-        linear-gradient(90deg,
-        #ff2b75,
-        #ff8fb5);
-
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
+    color:#ff72a8;
 }
 
 .rocket-mult{
-    font-size:38px;
+    font-size:32px;
     font-weight:900;
 }
 
 .rocket-win{
-    font-size:22px;
+    font-size:18px;
     font-weight:800;
 
     color:var(--green);
 }
 
-.rocket-loss{
-    font-size:22px;
-    font-weight:800;
-
-    color:#ff5b81;
-}
-
 /* BOTTOM */
 
 .bottom{
-    padding:14px;
+    flex-shrink:0;
+
+    padding:12px;
 
     background:
-        rgba(8,8,14,.82);
-
-    backdrop-filter:blur(20px);
+        rgba(16,18,28,.95);
 
     border-top:
         1px solid rgba(255,255,255,.05);
 }
 
-/* ACTIONS */
+/* BUTTONS */
 
 .actions{
     display:grid;
@@ -365,36 +280,34 @@ body{
     grid-template-columns:
         repeat(3,1fr);
 
-    gap:12px;
+    gap:8px;
 
-    margin-bottom:14px;
+    margin-bottom:10px;
 }
 
 .actions button{
     border:none;
 
-    border-radius:22px;
+    padding:13px;
 
-    padding:15px;
+    border-radius:16px;
 
     background:
-        linear-gradient(145deg,
-        rgba(255,255,255,.06),
-        rgba(255,255,255,.03));
+        #171a24;
 
     border:
-        1px solid rgba(255,255,255,.08);
+        1px solid rgba(255,255,255,.05);
 
     color:white;
 
     font-size:14px;
-    font-weight:800;
+    font-weight:700;
 
     cursor:pointer;
 }
 
 .actions button:active{
-    transform:scale(.95);
+    transform:scale(.97);
 }
 
 /* INPUT */
@@ -402,6 +315,7 @@ body{
 .input-wrap{
     display:flex;
     flex-direction:column;
+
     gap:10px;
 }
 
@@ -409,19 +323,17 @@ body{
     display:flex;
     align-items:center;
 
-    gap:10px;
+    gap:8px;
 
-    padding:8px 8px 8px 18px;
+    padding:8px 8px 8px 15px;
 
-    border-radius:28px;
+    border-radius:22px;
 
     background:
-        linear-gradient(145deg,
-        rgba(255,255,255,.06),
-        rgba(255,255,255,.03));
+        #171a24;
 
     border:
-        1px solid rgba(255,255,255,.08);
+        1px solid rgba(255,255,255,.05);
 }
 
 .input-row input{
@@ -438,16 +350,16 @@ body{
 }
 
 .input-row input::placeholder{
-    color:#7d8298;
+    color:#7f879c;
 }
 
 .send-btn{
-    width:50px;
-    height:50px;
+    width:46px;
+    height:46px;
 
     border:none;
 
-    border-radius:20px;
+    border-radius:15px;
 
     background:
         linear-gradient(145deg,
@@ -456,24 +368,26 @@ body{
 
     color:white;
 
-    font-size:18px;
+    font-size:17px;
 
     cursor:pointer;
 }
 
-/* BUTTONS */
+/* ROCKET BUTTONS */
 
 .cashout-btn,
 .skip-btn{
     width:100%;
 
-    min-height:54px;
+    margin-top:8px;
+
+    min-height:48px;
 
     border:none;
 
-    border-radius:20px;
+    border-radius:16px;
 
-    font-size:15px;
+    font-size:14px;
     font-weight:800;
 
     cursor:pointer;
@@ -483,27 +397,22 @@ body{
     background:
         linear-gradient(145deg,
         var(--green),
-        #00d48f);
+        #00d18f);
 
     color:black;
 }
 
 .skip-btn{
     background:
-        rgba(255,255,255,.06);
+        rgba(255,255,255,.05);
 
-    color:#ffc85e;
+    color:#ffc861;
 }
 
 </style>
 </head>
 
 <body>
-
-<div class="grid"></div>
-
-<div class="blur blur1"></div>
-<div class="blur blur2"></div>
 
 <div class="header">
 
@@ -515,12 +424,12 @@ body{
 
         <div class="logo-text">
             <h1>Nyanbot</h1>
-            <p>modern miniapp ui</p>
+            <p>miniapp</p>
         </div>
 
     </div>
 
-    <div class="online">
+    <div class="status">
         💎 online
     </div>
 
@@ -529,7 +438,7 @@ body{
 <div class="chat" id="chat">
 
     <div class="msg bot">
-        ⚡ Подключение...
+        ⚡ Подключение к серверу...
     </div>
 
 </div>
@@ -594,7 +503,8 @@ body{
 
 <script>
 
-const tg = window.Telegram.WebApp;
+const tg =
+window.Telegram.WebApp;
 
 tg.ready();
 tg.expand();
@@ -604,12 +514,6 @@ document.getElementById('chat');
 
 const input =
 document.getElementById('cmdInput');
-
-const initData =
-tg.initData || '';
-
-const API_URL =
-'https://slightly-projector-rigging.ngrok-free.dev/api/command';
 
 function add(text,type){
 
@@ -623,11 +527,43 @@ function add(text,type){
 
     chat.appendChild(div);
 
-    chat.scrollTop =
-    chat.scrollHeight;
+    setTimeout(()=>{
+        chat.scrollTop =
+        chat.scrollHeight;
+    },10);
 
     return div;
 }
+
+/* ПОДКЛЮЧЕНИЕ */
+
+setTimeout(()=>{
+
+    add(
+    '🔐 Проверка соединения...',
+    'bot');
+
+},700);
+
+setTimeout(()=>{
+
+    add(
+    '✅ Соединение установлено',
+    'bot');
+
+},1500);
+
+setTimeout(()=>{
+
+    add(
+`👋 Добро пожаловать в Nyanbot
+
+💬 Введите команду ниже`,
+'bot');
+
+},2200);
+
+/* КОМАНДЫ */
 
 function sendCmd(explicitCmd){
 
@@ -641,44 +577,19 @@ function sendCmd(explicitCmd){
 
     input.value = '';
 
-    const xhr =
-    new XMLHttpRequest();
+    setTimeout(()=>{
 
-    xhr.open(
-    'POST',
-    API_URL,
-    true
-    );
+        add(
+`🤖 Команда получена:
+${cmd}`,
+'bot');
 
-    xhr.setRequestHeader(
-    'Content-Type',
-    'application/json'
-    );
-
-    xhr.onload = function(){
-
-        const data =
-        JSON.parse(xhr.responseText);
-
-        if(data.reply){
-
-            add(
-            data.reply,
-            'bot'
-            );
-        }
-    };
-
-    xhr.send(JSON.stringify({
-        command:cmd,
-        tg_data:initData
-    }));
+    },400);
 }
 
 /* ROCKET */
 
 let rocketMsg = null;
-let rocketInterval = null;
 
 function startRocket(){
 
@@ -691,85 +602,6 @@ function startRocket(){
     row.style.display === 'flex'
     ? 'none'
     : 'flex';
-}
-
-function rocketHTML(type,data={}){
-
-    if(type === 'flying'){
-
-        return `
-<div class="rocket-title">
-🚀 РАКЕТА ЛЕТИТ
-</div>
-
-<div class="rocket-mult">
-x${data.mult}
-</div>
-
-<div>
-💰 Ставка: ${data.bet}🪙
-</div>
-
-<div>
-🟢 Шанс: ${data.chance}%
-</div>
-
-<div class="rocket-win">
-💎 ${data.pot}🪙
-</div>
-`;
-    }
-
-    if(type === 'cashout'){
-
-        return `
-<div class="rocket-title">
-✅ ВЫИГРЫШ ЗАБРАН
-</div>
-
-<div class="rocket-mult">
-x${data.mult}
-</div>
-
-<div class="rocket-win">
-💰 ${data.win}🪙
-</div>
-
-<div>
-🚀 Ракета ещё летит...
-</div>
-`;
-    }
-
-    if(type === 'lost'){
-
-        return `
-<div class="rocket-title">
-💥 РАКЕТА ВЗОРВАЛАСЬ
-</div>
-
-<div class="rocket-loss">
--${data.bet}🪙
-</div>
-
-<div>
-😢 Ставка сгорела
-</div>
-`;
-    }
-
-    if(type === 'skip'){
-
-        return `
-<div class="rocket-title">
-⏭ ПРОПУЩЕНО
-</div>
-
-<div class="rocket-win">
-💰 ${data.win}🪙
-</div>
-`;
-    }
 }
 
 function launchRocket(){
@@ -785,267 +617,82 @@ function launchRocket(){
     'rocketBetRow'
     ).style.display = 'none';
 
-    const xhr =
-    new XMLHttpRequest();
+    rocketMsg =
+    add(`
+<div class="rocket-title">
+🚀 РАКЕТА ЛЕТИТ
+</div>
 
-    xhr.open(
-    'POST',
-    API_URL,
-    true
-    );
+<div class="rocket-mult">
+x1.00
+</div>
 
-    xhr.setRequestHeader(
-    'Content-Type',
-    'application/json'
-    );
+<div>
+💰 Ставка: ${bet}🪙
+</div>
 
-    xhr.onload = function(){
+<div class="rocket-win">
+💎 ${bet}🪙
+</div>
+`,
+'rocket');
 
-        const data =
-        JSON.parse(xhr.responseText);
+    const btn =
+    document.createElement('button');
 
-        if(data.status === 'success'
-        && data.game){
+    btn.className =
+    'cashout-btn';
 
-            rocketMsg = add(
-            rocketHTML(
-            'flying',
-            {
-                mult:'1.00',
-                bet:bet,
-                chance:97,
-                pot:bet
-            }),
-            'rocket'
-            );
+    btn.innerText =
+    '💰 ЗАБРАТЬ';
 
-            const btn =
-            document.createElement('button');
+    btn.onclick =
+    cashoutRocket;
 
-            btn.className =
-            'cashout-btn';
-
-            btn.innerText =
-            '💰 ЗАБРАТЬ';
-
-            btn.onclick =
-            cashoutRocket;
-
-            rocketMsg.appendChild(btn);
-
-            updateRocketState(bet);
-        }
-    };
-
-    xhr.send(JSON.stringify({
-        action:'rocket_start',
-        bet:bet,
-        tg_data:initData
-    }));
-}
-
-function updateRocketState(bet){
-
-    if(rocketInterval){
-
-        clearInterval(
-        rocketInterval
-        );
-    }
-
-    rocketInterval =
-    setInterval(()=>{
-
-        const xhr =
-        new XMLHttpRequest();
-
-        xhr.open(
-        'POST',
-        API_URL,
-        true
-        );
-
-        xhr.setRequestHeader(
-        'Content-Type',
-        'application/json'
-        );
-
-        xhr.onload = function(){
-
-            const data =
-            JSON.parse(xhr.responseText);
-
-            if(!rocketMsg) return;
-
-            if(
-            data.active &&
-            !data.cashed_out
-            ){
-
-                const mult =
-                data.multiplier || 1;
-
-                const pot =
-                Math.floor(
-                bet * mult
-                );
-
-                const chance =
-                mult < 1.5 ? 97 :
-                mult < 2.5 ? 82 :
-                mult < 4 ? 55 :
-                30;
-
-                rocketMsg.innerHTML =
-                rocketHTML(
-                'flying',
-                {
-                    mult:mult,
-                    bet:bet,
-                    chance:chance,
-                    pot:pot
-                });
-
-                const btn =
-                document.createElement('button');
-
-                btn.className =
-                'cashout-btn';
-
-                btn.innerText =
-                '💰 ЗАБРАТЬ';
-
-                btn.onclick =
-                cashoutRocket;
-
-                rocketMsg.appendChild(btn);
-
-            }else{
-
-                clearInterval(
-                rocketInterval
-                );
-
-                if(data.cashed_out){
-
-                    rocketMsg.innerHTML =
-                    rocketHTML(
-                    'cashout',
-                    {
-                        mult:
-                        data.multiplier || 1,
-
-                        win:
-                        data.winnings || 0
-                    });
-
-                    const skip =
-                    document.createElement('button');
-
-                    skip.className =
-                    'skip-btn';
-
-                    skip.innerText =
-                    '⏭ ПРОПУСТИТЬ';
-
-                    skip.onclick =
-                    function(){
-
-                        rocketMsg.innerHTML =
-                        rocketHTML(
-                        'skip',
-                        {
-                            win:
-                            data.winnings || 0
-                        });
-                    };
-
-                    rocketMsg.appendChild(skip);
-
-                }else{
-
-                    rocketMsg.innerHTML =
-                    rocketHTML(
-                    'lost',
-                    {
-                        bet:bet
-                    });
-                }
-            }
-        };
-
-        xhr.send(JSON.stringify({
-            action:'rocket_state',
-            tg_data:initData
-        }));
-
-    },600);
+    rocketMsg.appendChild(btn);
 }
 
 function cashoutRocket(){
 
-    const xhr =
-    new XMLHttpRequest();
+    rocketMsg.innerHTML =
+`
+<div class="rocket-title">
+✅ ВЫИГРЫШ ЗАБРАН
+</div>
 
-    xhr.open(
-    'POST',
-    API_URL,
-    true
-    );
+<div class="rocket-mult">
+x1.47
+</div>
 
-    xhr.setRequestHeader(
-    'Content-Type',
-    'application/json'
-    );
+<div class="rocket-win">
+💰 147🪙
+</div>
+`;
 
-    xhr.onload = function(){
+    const skip =
+    document.createElement('button');
 
-        const data =
-        JSON.parse(xhr.responseText);
+    skip.className =
+    'skip-btn';
 
-        if(data.status === 'success'
-        && rocketMsg){
+    skip.innerText =
+    '⏭ ПРОПУСТИТЬ';
 
-            rocketMsg.innerHTML =
-            rocketHTML(
-            'cashout',
-            {
-                mult:
-                data.multiplier || 1,
+    skip.onclick = ()=>{
 
-                win:
-                data.winnings || 0
-            });
+        rocketMsg.innerHTML =
+`
+<div class="rocket-title">
+⏭ ПРОПУЩЕНО
+</div>
 
-            const skip =
-            document.createElement('button');
-
-            skip.className =
-            'skip-btn';
-
-            skip.innerText =
-            '⏭ ПРОПУСТИТЬ';
-
-            skip.onclick =
-            function(){
-
-                rocketMsg.innerHTML =
-                rocketHTML(
-                'skip',
-                {
-                    win:
-                    data.winnings || 0
-                });
-            };
-
-            rocketMsg.appendChild(skip);
-        }
+<div class="rocket-win">
+💰 147🪙
+</div>
+`;
     };
 
-    xhr.send(JSON.stringify({
-        action:'rocket_cashout',
-        tg_data:initData
-    }));
+    rocketMsg.appendChild(skip);
 }
 
 input.addEventListener(
