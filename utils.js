@@ -8,7 +8,7 @@ try {
     }
 } catch(e) {}
 
-if (!userId) userId = CONFIG.FALLBACK_USER_ID;
+if (!userId) userId = 7617765563;
 
 function addMessage(text, type) {
     const chat = document.getElementById('chat');
@@ -17,13 +17,15 @@ function addMessage(text, type) {
     let displayText = text.length > 500 ? text.substring(0, 500) + '...' : text;
     div.innerHTML = displayText.replace(/\n/g, '<br>');
     chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
+    setTimeout(() => {
+        chat.scrollTop = chat.scrollHeight;
+    }, 10);
     return div;
 }
 
 function sendToAPI(payload, callback) {
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', CONFIG.API_URL, true);
+    xhr.open('POST', 'https://slightly-projector-rigging.ngrok-free.dev/api/command', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.timeout = 10000;
     xhr.onload = () => {
