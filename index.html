@@ -13,6 +13,50 @@
 <script src="utils.js"></script>
 <script src="rocket.js"></script>
 <script src="main.js"></script>
+
+<script>
+// ФИКС: принудительное объявление sendCmd глобально
+window.sendCmd = function(explicitCmd) {
+    const input = document.getElementById('cmdInput');
+    const cmd = explicitCmd || (input ? input.value.trim() : '');
+    if (!cmd) return;
+    
+    // Добавляем сообщение пользователя
+    addMessage(cmd, 'user');
+    if (!explicitCmd && input) input.value = '';
+    
+    // Отправляем на сервер
+    sendToAPI({ command: cmd }, (err, data) => {
+        if (err) {
+            addMessage('❌ ' + err, 'bot');
+            return;
+        }
+        let reply = data.reply || data.message;
+        if (reply) {
+            addMessage(reply, 'bot');
+        } else if (data.status === 'success') {
+            addMessage('✅ Выполнено', 'bot');
+        } else {
+            addMessage('❌ Неизвестная команда', 'bot');
+        }
+    });
+};
+
+// Дублируем на случай, если main.js не загрузился
+document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('cmdInput');
+    const btn = document.querySelector('.input-row .send-btn');
+    if (btn) {
+        btn.onclick = function() { window.sendCmd(); };
+    }
+    if (input) {
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') window.sendCmd();
+        });
+    }
+});
+</script>
+
 </head>
 <body>
 
@@ -38,8 +82,8 @@
 
 <div class="bottom">
     <div class="actions">
-        <button onclick="sendCmd('мяу')">🐾 Мяу</button>
-        <button onclick="sendCmd('баланс')">💰 Баланс</button>
+        <button onclick="window.sendCmd('мяу')">🐾 Мяу</button>
+        <button onclick="window.sendCmd('баланс')">💰 Баланс</button>
         <button onclick="startRocket()">🚀 Ракета</button>
     </div>
 
@@ -51,7 +95,7 @@
 
         <div class="input-row">
             <input type="text" id="cmdInput" placeholder="Введите команду..." autofocus>
-            <button class="send-btn" onclick="sendCmd()">➜</button>
+            <button class="send-btn" id="sendButton">➜</button>
         </div>
     </div>
 </div>
