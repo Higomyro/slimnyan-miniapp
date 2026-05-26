@@ -2,25 +2,30 @@ tg.ready();
 tg.expand();
 
 const input = document.getElementById('cmdInput');
+const sendBtn = document.querySelector('.input-row .send-btn');
 
 function loadHello() {
     updateStatus('🔄 соединение...', false);
     sendToAPI({ command: '/start' }, (err, data) => {
         if (err) {
             updateStatus('❌ ошибка', false);
-            document.getElementById('chat').innerHTML = '<div class="msg bot">❌ ' + err + '</div>';
+            const chat = document.getElementById('chat');
+            if (chat) chat.innerHTML = '<div class="msg bot">❌ ' + err + '</div>';
             return;
         }
         updateStatus('✅ online', true);
         const reply = data.reply || (data.status === 'success' ? data.reply : null);
         if (reply) {
-            document.getElementById('chat').innerHTML = '';
-            addMessage(reply, 'bot');
+            const chat = document.getElementById('chat');
+            if (chat) {
+                chat.innerHTML = '';
+                addMessage(reply, 'bot');
+            }
         }
     });
 }
 
-function sendCmd(explicitCmd) {
+window.sendCmd = function(explicitCmd) {
     const cmd = explicitCmd || input.value.trim();
     if (!cmd) return;
     addMessage(cmd, 'user');
@@ -40,10 +45,14 @@ function sendCmd(explicitCmd) {
             addMessage('❌ Неизвестная команда', 'bot');
         }
     });
+};
+
+if (sendBtn) {
+    sendBtn.onclick = () => window.sendCmd();
 }
 
 input.addEventListener('keypress', e => {
-    if (e.key === 'Enter') sendCmd();
+    if (e.key === 'Enter') window.sendCmd();
 });
 
 tg.MainButton.setText('Закрыть').show().onClick(() => tg.close());
