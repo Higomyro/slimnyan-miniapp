@@ -25,7 +25,7 @@ function addMessage(text, type) {
 
 function sendToAPI(payload, callback) {
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'https://slightly-projector-rigging.ngrok-free.dev/api/command', true);
+    xhr.open('POST', CONFIG.API_URL, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.timeout = 10000;
     xhr.onload = () => {
