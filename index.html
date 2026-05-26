@@ -2,17 +2,11 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Nyanbot Ultra UI</title>
-
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
 <link rel="stylesheet" href="style.css">
-
-<script src="config.js"></script>
-<script src="rocket.js"></script>
-<script src="main.js"></script>
 </head>
 <body>
 
@@ -42,13 +36,11 @@
         <button onclick="sendCmd('баланс')">💰 Баланс</button>
         <button onclick="startRocket()">🚀 Ракета</button>
     </div>
-
     <div class="input-wrap">
         <div class="input-row" id="rocketBetRow" style="display:none;">
             <input type="number" id="betInput" placeholder="Ставка..." value="100">
             <button class="send-btn" onclick="launchRocket()">🚀</button>
         </div>
-
         <div class="input-row">
             <input type="text" id="cmdInput" placeholder="Введите команду..." autofocus>
             <button class="send-btn" onclick="sendCmd()">➜</button>
@@ -56,5 +48,6 @@
     </div>
 </div>
 
+<script src="script.js"></script>
 </body>
 </html>
