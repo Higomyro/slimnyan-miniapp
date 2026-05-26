@@ -15,16 +15,16 @@
 <script src="main.js"></script>
 
 <script>
-// Глобальная функция отправки
-function sendMessage() {
+// Глобальная функция отправки команды
+function sendMessage(cmd) {
     const input = document.getElementById('cmdInput');
-    const cmd = input ? input.value.trim() : '';
-    if (!cmd) return;
+    const command = cmd || (input ? input.value.trim() : '');
+    if (!command) return;
     
-    addMessage(cmd, 'user');
-    if (input) input.value = '';
+    addMessage(command, 'user');
+    if (!cmd && input) input.value = '';
     
-    sendToAPI({ command: cmd }, (err, data) => {
+    sendToAPI({ command: command }, (err, data) => {
         if (err) {
             addMessage('❌ ' + err, 'bot');
             return;
@@ -45,6 +45,14 @@ function startRocket() {
     addMessage('🚀 Ракета временно в разработке. Скоро появится!', 'bot');
 }
 
+// Получение имени пользователя
+let userName = 'Пользователь';
+try {
+    if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.first_name) {
+        userName = tg.initDataUnsafe.user.first_name;
+    }
+} catch(e) {}
+
 document.addEventListener('DOMContentLoaded', function() {
     const input = document.getElementById('cmdInput');
     if (input) {
@@ -52,7 +60,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (e.key === 'Enter') sendMessage();
         });
     }
-    updateStatus('✅ Вы подключились к серверу', true);
+    // Статус подключения с именем
+    updateStatus('✅ ' + userName + ', вы подключились к серверу', true);
 });
 </script>
 
