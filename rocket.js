@@ -1,6 +1,7 @@
 // rocket.js
 let rocketMsg = null;
 let rocketInterval = null;
+let currentRocketBet = 0;
 
 function startRocket() {
     const row = document.getElementById('rocketBetRow');
@@ -11,49 +12,60 @@ function launchRocket() {
     const bet = parseInt(document.getElementById('betInput').value) || 100;
     document.getElementById('rocketBetRow').style.display = 'none';
 
-    sendRequest({
-        action: 'rocket_start',
-        bet: bet,
-        tg_data: initData
-    }, (data) => {
-        if (data.status === 'success' && data.game) {
-            rocketMsg = add(
-                `🚀 РАКЕТА ВЗЛЕТАЕТ\n\n💰 Ставка: ${bet}🪙\n\n📈 x1.00\n🟢 Шанс: 97%\n\n💎 Потенциал растёт...`,
+    sendToAPI({ action: 'rocket_start', bet: bet }, (err, data) => {
+        if (err) {
+            addMessage('❌ ' + err, 'bot');
+            return;
+        }
+        if (data.status === 'success' && data.message === 'rocket started') {
+            currentRocketBet = bet;
+            rocketMsg = addMessage(
+                `🚀 РАКЕТА ВЗЛЕТАЕТ\n\n💰 Ставка: ${bet}🪙\n\n📈 x1.00\n🟢 Шанс: 97%\n\n💎 Ожидаем...`,
                 'rocket'
             );
             const cashoutBtn = document.createElement('button');
             cashoutBtn.className = 'cashout-btn';
             cashoutBtn.textContent = '💰 ЗАБРАТЬ ВЫИГРЫШ';
-            cashoutBtn.onclick = cashoutRocket;
+            cashoutBtn.onclick = () => cashoutRocket();
             rocketMsg.appendChild(cashoutBtn);
-            updateRocketState(bet);
+            
+            const skipBtn = document.createElement('button');
+            skipBtn.className =skip-btn';
+            skipBtn.textContent = '⏭ ПРОПУСТИТЬ АНИМАЦИЮ';
+            skipBtn.onclick = () => skipRocket();
+            rocketMsg.appendChild(skipBtn);
+            
+            updateRocketState();
+        } else if (data.message) {
+            addMessage('❌ ' + data.message, 'bot');
         } else {
-            add('❌ ' + (data.message || 'Ошибка'), 'bot');
+            addMessage('❌ Ошибка запуска ракеты', 'bot');
         }
     });
 }
 
-function updateRocketState(bet) {
+function updateRocketState() {
     if (rocketInterval) clearInterval(rocketInterval);
     rocketInterval = setInterval(() => {
-        sendRequest({
-            action: 'rocket_state',
-            tg_data: initData
-        }, (data) => {
-            if (!rocketMsg) {
-                clearInterval(rocketInterval);
+        sendToAPI({ action: 'rocket_state' }, (err, data) => {
+            if (err || !data || data.status === 'error') {
+                if (rocketInterval) clearInterval(rocketInterval);
                 return;
             }
-            if (data.status === 'success' && data.active && !data.cashed_out) {
+            if (!rocketMsg) {
+                if (rocketInterval) clearInterval(rocketInterval);
+                return;
+            }
+            if (data.active) {
                 const mult = data.multiplier;
-                const pot = data.potential || Math.floor(bet * mult);
-                rocketMsg.innerHTML = `🚀 РАКЕТА ВЗЛЕТАЕТ<br><br>💰 Ставка: ${bet}🪙<br><br>📈 x${mult}<br>💎 ${pot}🪙`;
+                const pot = Math.floor(currentRocketBet * mult);
+                rocketMsg.innerHTML = `🚀 РАКЕТА ВЗЛЕТАЕТ<br><br>💰 Ставка: ${currentRocketBet}🪙<br><br>📈 x${mult}<br>💎 ${pot}🪙`;
             } else {
-                clearInterval(rocketInterval);
+                if (rocketInterval) clearInterval(rocketInterval);
                 if (data.cashed_out) {
-                    rocketMsg.innerHTML = `✅ ВЫ ЗАБРАЛИ ВЫИГРЫШ<br><br>💰 ${data.winnings}🪙`;
+                    rocketMsg.innerHTML = `✅ ВЫ ЗАБРАЛИ ВЫИГРЫШ<br><br>💰 ${currentRocketBet}🪙`;
                 } else {
-                    rocketMsg.innerHTML = `💥 РАКЕТА ВЗОРВАЛАСЬ<br><br>😢 Ставка ${bet}🪙 сгорела`;
+                    rocketMsg.innerHTML = `💥 РАКЕТА ВЗОРВАЛАСЬ<br><br>😢 Ставка ${currentRocketBet}🪙 сгорела`;
                     rocketMsg = null;
                 }
             }
@@ -62,13 +74,23 @@ function updateRocketState(bet) {
 }
 
 function cashoutRocket() {
-    sendRequest({
-        action: 'rocket_cashout',
-        tg_data: initData
-    }, (data) => {
-        if (data.status === 'success' && rocketMsg) {
-            rocketMsg.innerHTML = `✅ КЭШАУТ УСПЕШЕН<br><br>💰 ${data.winnings}🪙`;
-            clearInterval(rocketInterval);
+    sendToAPI({ action: 'rocket_cashout' }, (err, data) => {
+        if (err) {
+            addMessage('❌ ' + err, 'bot');
+            return;
+        }
+        if (rocketMsg) {
+            rocketMsg.innerHTML = `✅ КЭШАУТ УСПЕШЕН<br><br>💰 Выигрыш сохранён`;
+            if (rocketInterval) clearInterval(rocketInterval);
+        }
+    });
+}
+
+function skipRocket() {
+    sendToAPI({ action: 'rocket_skip' }, (err, data) => {
+        if (rocketMsg) {
+            rocketMsg.innerHTML = `⏭ АНИМАЦИЯ ПРОПУЩЕНА<br><br>💰 Результат в чате бота`;
+            if (rocketInterval) clearInterval(rocketInterval);
         }
     });
 }
