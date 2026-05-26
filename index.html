@@ -15,17 +15,15 @@
 <script src="main.js"></script>
 
 <script>
-// ФИКС: принудительное объявление sendCmd глобально
+// ПРИНУДИТЕЛЬНОЕ ОБЪЯВЛЕНИЕ sendCmd
 window.sendCmd = function(explicitCmd) {
     const input = document.getElementById('cmdInput');
     const cmd = explicitCmd || (input ? input.value.trim() : '');
     if (!cmd) return;
     
-    // Добавляем сообщение пользователя
     addMessage(cmd, 'user');
     if (!explicitCmd && input) input.value = '';
     
-    // Отправляем на сервер
     sendToAPI({ command: cmd }, (err, data) => {
         if (err) {
             addMessage('❌ ' + err, 'bot');
@@ -42,17 +40,29 @@ window.sendCmd = function(explicitCmd) {
     });
 };
 
-// Дублируем на случай, если main.js не загрузился
+// ЖДЁМ ЗАГРУЗКИ СТРАНИЦЫ И ВЕШАЕМ КНОПКУ
 document.addEventListener('DOMContentLoaded', function() {
     const input = document.getElementById('cmdInput');
-    const btn = document.querySelector('.input-row .send-btn');
-    if (btn) {
-        btn.onclick = function() { window.sendCmd(); };
+    const sendBtn = document.querySelector('.input-row .send-btn');
+    
+    // Кнопка отправки
+    if (sendBtn) {
+        sendBtn.onclick = function(e) {
+            e.preventDefault();
+            window.sendCmd();
+        };
+        console.log('Кнопка отправки привязана');
     }
+    
+    // Enter
     if (input) {
         input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') window.sendCmd();
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                window.sendCmd();
+            }
         });
+        console.log('Enter привязан');
     }
 });
 </script>
@@ -95,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         <div class="input-row">
             <input type="text" id="cmdInput" placeholder="Введите команду..." autofocus>
-            <button class="send-btn" id="sendButton">➜</button>
+            <button class="send-btn" id="mainSendBtn">➜</button>
         </div>
     </div>
 </div>
