@@ -1,12 +1,23 @@
 // utils.js
-let chat, initData;
+const tg = window.Telegram.WebApp;
+let userId = null;
+let initData = tg.initData || '';
 
-function initGlobals() {
-    chat = document.getElementById('chat');
-    initData = window.Telegram.WebApp.initData || '';
+try {
+    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        userId = tg.initDataUnsafe.user.id;
+    }
+} catch(e) {
+    console.log('Error getting user:', e);
 }
 
-function add(text, type) {
+if (!userId) {
+    userId = CONFIG.FALLBACK_USER_ID;
+    console.log('Using fallback user_id:', userId);
+}
+
+function addMessage(text, type) {
+    const chat = document.getElementById('chat');
     const div = document.createElement('div');
     div.className = 'msg ' + type;
     div.innerHTML = text.replace(/\n/g, '<br>');
@@ -15,30 +26,23 @@ function add(text, type) {
     return div;
 }
 
-function loadHello() {
+function sendToAPI(payload, callback) {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', CONFIG.API_URL, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onload = () => {
         if (xhr.status === 200) {
-            const data = JSON.parse(xhr.responseText);
-            if (data.reply) {
-                chat.innerHTML = '';
-                add(data.reply, 'bot');
-            }
+            callback(null, JSON.parse(xhr.responseText));
+        } else {
+            callback('HTTP ' + xhr.status, null);
         }
     };
-    xhr.send(JSON.stringify({ command: '/start', tg_data: initData }));
-}
-
-function sendRequest(payload, onSuccess) {
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', CONFIG.API_URL, true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onload = () => {
-        if (xhr.status === 200) {
-            onSuccess(JSON.parse(xhr.responseText));
-        }
+    xhr.onerror = () => {
+        callback('Сервер недоступен', null);
     };
-    xhr.send(JSON.stringify(payload));
+    xhr.send(JSON.stringify({
+        ...payload,
+        tg_data: initData,
+        user_id: userId
+    }));
 }
