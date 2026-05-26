@@ -15,14 +15,14 @@
 <script src="main.js"></script>
 
 <script>
-// ПРИНУДИТЕЛЬНОЕ ОБЪЯВЛЕНИЕ sendCmd
-window.sendCmd = function(explicitCmd) {
+// Глобальная функция отправки
+function sendMessage() {
     const input = document.getElementById('cmdInput');
-    const cmd = explicitCmd || (input ? input.value.trim() : '');
+    const cmd = input ? input.value.trim() : '';
     if (!cmd) return;
     
     addMessage(cmd, 'user');
-    if (!explicitCmd && input) input.value = '';
+    if (input) input.value = '';
     
     sendToAPI({ command: cmd }, (err, data) => {
         if (err) {
@@ -38,32 +38,21 @@ window.sendCmd = function(explicitCmd) {
             addMessage('❌ Неизвестная команда', 'bot');
         }
     });
-};
+}
 
-// ЖДЁМ ЗАГРУЗКИ СТРАНИЦЫ И ВЕШАЕМ КНОПКУ
+// Заглушка для ракеты
+function startRocket() {
+    addMessage('🚀 Ракета временно в разработке. Скоро появится!', 'bot');
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const input = document.getElementById('cmdInput');
-    const sendBtn = document.querySelector('.input-row .send-btn');
-    
-    // Кнопка отправки
-    if (sendBtn) {
-        sendBtn.onclick = function(e) {
-            e.preventDefault();
-            window.sendCmd();
-        };
-        console.log('Кнопка отправки привязана');
-    }
-    
-    // Enter
     if (input) {
         input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                window.sendCmd();
-            }
+            if (e.key === 'Enter') sendMessage();
         });
-        console.log('Enter привязан');
     }
+    updateStatus('✅ Вы подключились к серверу', true);
 });
 </script>
 
@@ -92,20 +81,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <div class="bottom">
     <div class="actions">
-        <button onclick="window.sendCmd('мяу')">🐾 Мяу</button>
-        <button onclick="window.sendCmd('баланс')">💰 Баланс</button>
+        <button onclick="sendMessage('мяу')">🐾 Мяу</button>
+        <button onclick="sendMessage('баланс')">💰 Баланс</button>
         <button onclick="startRocket()">🚀 Ракета</button>
     </div>
 
     <div class="input-wrap">
-        <div class="input-row" id="rocketBetRow" style="display:none;">
-            <input type="number" id="betInput" placeholder="Ставка..." value="100">
-            <button class="send-btn" onclick="launchRocket()">🚀</button>
-        </div>
-
         <div class="input-row">
             <input type="text" id="cmdInput" placeholder="Введите команду..." autofocus>
-            <button class="send-btn" id="mainSendBtn">➜</button>
+            <button class="send-btn" onclick="sendMessage()">➜</button>
         </div>
     </div>
 </div>
