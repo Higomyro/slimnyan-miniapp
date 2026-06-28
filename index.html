@@ -16,7 +16,7 @@
 </head>
 <body>
 
-<!-- ===== САЙДБАР (ЧЁРНО-БЕЛЫЙ) ===== -->
+<!-- ===== САЙДБАР ===== -->
 <div class="sidebar">
     <div class="logo">🐾</div>
 
@@ -75,7 +75,7 @@
             <button onclick="sendMessage('мяу')">🐾 Мяу</button>
             <button onclick="sendMessage('баланс')">💰 Баланс</button>
             <button onclick="startRocket()">🚀 Ракета</button>
-            <button class="primary" onclick="sendMessage('статистика')">📊 ТК</button>
+            <button class="primary" onclick="showStats()">📊 ТК</button>
         </div>
 
         <div class="input-row">
@@ -84,6 +84,21 @@
         </div>
     </div>
 
+</div>
+
+<!-- ===== ВЫДВИЖНОЙ СЛОЙ (СТАТИСТИКА) ===== -->
+<div class="overlay" id="statsOverlay">
+    <div class="overlay-content">
+        <div class="overlay-title">📊 Статистика</div>
+        <div id="statsImageContainer">
+            <img id="statsImage" src="" alt="Статистика" style="display:none;">
+            <div id="statsLoading" style="color:#666; padding:40px;">⏳ Генерация статистики...</div>
+        </div>
+        <div class="overlay-actions">
+            <button class="primary" onclick="refreshStats()">🔄 Перезапустить</button>
+            <button onclick="closeOverlay()">✕ Закрыть</button>
+        </div>
+    </div>
 </div>
 
 </body>
