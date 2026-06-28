@@ -1,106 +1,89 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Nyanbot Ultra UI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Nyanbot</title>
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="style.css">
-<script src="config.js"></script>
-<script src="utils.js"></script>
-<script src="rocket.js"></script>
-<script src="main.js"></script>
-
-<script>
-// Глобальная функция отправки команды
-function sendMessage(cmd) {
-    const input = document.getElementById('cmdInput');
-    const command = cmd || (input ? input.value.trim() : '');
-    if (!command) return;
-    
-    addMessage(command, 'user');
-    if (!cmd && input) input.value = '';
-    
-    sendToAPI({ command: command }, (err, data) => {
-        if (err) {
-            addMessage('❌ ' + err, 'bot');
-            return;
-        }
-        let reply = data.reply || data.message;
-        if (reply) {
-            addMessage(reply, 'bot');
-        } else if (data.status === 'success') {
-            addMessage('✅ Выполнено', 'bot');
-        } else {
-            addMessage('❌ Неизвестная команда', 'bot');
-        }
-    });
-}
-
-// Заглушка для ракеты
-function startRocket() {
-    addMessage('🚀 Ракета временно в разработке. Скоро появится!', 'bot');
-}
-
-// Получение имени пользователя
-let userName = 'Пользователь';
-try {
-    if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.first_name) {
-        userName = tg.initDataUnsafe.user.first_name;
-    }
-} catch(e) {}
-
-document.addEventListener('DOMContentLoaded', function() {
-    const input = document.getElementById('cmdInput');
-    if (input) {
-        input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') sendMessage();
-        });
-    }
-    // Статус подключения с именем
-    updateStatus('✅ ' + userName + ', вы подключились к серверу', true);
-});
-</script>
-
+    <link rel="stylesheet" href="style.css">
+    <script src="config.js"></script>
+    <script src="utils.js"></script>
+    <script src="rocket.js"></script>
+    <script src="main.js"></script>
 </head>
 <body>
 
-<div class="grid"></div>
-<div class="blur blur1"></div>
-<div class="blur blur2"></div>
-<div class="blur blur3"></div>
+<!-- ===== САЙДБАР (ЧЁРНО-БЕЛЫЙ) ===== -->
+<div class="sidebar">
+    <div class="logo">🐾</div>
 
-<div class="header">
-    <div class="header-left">
-        <div class="logo">🐾</div>
-        <div class="logo-text">
+    <button class="nav-item active" onclick="switchTab('home')" title="Главная">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+    </button>
+
+    <button class="nav-item" onclick="switchTab('chat')" title="Чат">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    </button>
+
+    <button class="nav-item" onclick="switchTab('stats')" title="Статистика">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 21H3m0-6l6-6 4 4 7-7"/></svg>
+    </button>
+
+    <button class="nav-item" onclick="switchTab('shop')" title="Магазин">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    </button>
+
+    <button class="nav-item" onclick="switchTab('profile')" title="Профиль">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </button>
+
+    <div class="nav-divider"></div>
+
+    <div class="nav-bottom">
+        <button class="nav-item" onclick="tg.close()" title="Закрыть">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+    </div>
+</div>
+
+<!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
+<div class="main">
+
+    <!-- ХЕДЕР -->
+    <div class="header">
+        <div class="header-left">
             <h1>Nyanbot</h1>
-            <p>ultra miniapp interface</p>
+            <span class="sub">/ ultra</span>
+        </div>
+        <div class="status">
+            <span class="dot"></span>
+            <span id="onlineStatus">online</span>
         </div>
     </div>
-    <div class="online" id="onlineStatus">🟢 online</div>
-</div>
 
-<div class="chat" id="chat">
-    <div class="msg bot">⚡ Подключение к серверу...</div>
-</div>
-
-<div class="bottom">
-    <div class="actions">
-        <button onclick="sendMessage('мяу')">🐾 Мяу</button>
-        <button onclick="sendMessage('баланс')">💰 Баланс</button>
-        <button onclick="startRocket()">🚀 Ракета</button>
+    <!-- ЧАТ -->
+    <div class="chat" id="chat">
+        <div class="msg bot">⚡ Подключение к серверу...</div>
     </div>
 
-    <div class="input-wrap">
+    <!-- НИЗ -->
+    <div class="bottom">
+        <div class="actions">
+            <button onclick="sendMessage('мяу')">🐾 Мяу</button>
+            <button onclick="sendMessage('баланс')">💰 Баланс</button>
+            <button onclick="startRocket()">🚀 Ракета</button>
+            <button class="primary" onclick="sendMessage('статистика')">📊 ТК</button>
+        </div>
+
         <div class="input-row">
             <input type="text" id="cmdInput" placeholder="Введите команду..." autofocus>
             <button class="send-btn" onclick="sendMessage()">➜</button>
         </div>
     </div>
+
 </div>
 
 </body>
