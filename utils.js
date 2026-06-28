@@ -10,6 +10,27 @@ try {
 
 if (!userId) userId = 7617765563;
 
+// === ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ===
+function switchTab(tab) {
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    const btns = document.querySelectorAll('.nav-item');
+    const idx = ['home', 'chat', 'stats', 'shop', 'profile'].indexOf(tab);
+    if (btns[idx]) btns[idx].classList.add('active');
+
+    // ЭТО ЗАГЛУШКА — ТУТ МОЖНО РЕАЛИЗОВАТЬ ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ
+    const chat = document.getElementById('chat');
+    const msgs = chat.querySelectorAll('.msg');
+    if (msgs.length > 0) {
+        const last = msgs[msgs.length - 1];
+        if (last.classList.contains('bot') || last.classList.contains('user')) {
+            // просто показываем статус
+            const status = document.getElementById('onlineStatus');
+            status.textContent = tab;
+            setTimeout(() => { status.textContent = 'online'; }, 1000);
+        }
+    }
+}
+
 function addMessage(text, type) {
     const chat = document.getElementById('chat');
     const div = document.createElement('div');
@@ -52,6 +73,5 @@ function updateStatus(text, isOk) {
     const el = document.getElementById('onlineStatus');
     if (el) {
         el.textContent = text;
-        el.style.color = isOk ? '#00ffb3' : '#ff6666';
     }
 }
