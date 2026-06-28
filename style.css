@@ -108,13 +108,6 @@ body {
     margin: 8px 0;
 }
 
-.sidebar .nav-bottom {
-    margin-top: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
 /* ===== ОСНОВНОЙ КОНТЕНТ ===== */
 .main {
     flex: 1;
@@ -162,6 +155,8 @@ body {
     gap: 8px;
     font-size: 12px;
     color: var(--text-secondary);
+    user-select: none; /* НЕЛЬЗЯ ВЫДЕЛЯТЬ */
+    -webkit-user-select: none;
 }
 
 .status .dot {
@@ -245,11 +240,6 @@ body {
     border: 1px solid #1a1a1a;
     padding: 20px;
     width: 100%;
-}
-
-.msg .cmd {
-    color: var(--accent);
-    font-weight: 600;
 }
 
 /* ===== НИЗ ===== */
@@ -347,6 +337,104 @@ body {
     transform: scale(0.92);
 }
 
+/* ===== ВЫДВИЖНОЙ СЛОЙ (OVERLAY) ===== */
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(20px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    animation: overlayIn 0.3s ease;
+}
+
+.overlay.active {
+    display: flex;
+}
+
+@keyframes overlayIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.overlay-content {
+    max-width: 92%;
+    max-height: 90vh;
+    background: #0d0d0d;
+    border: 1px solid #1a1a1a;
+    border-radius: 24px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.overlay-content img {
+    max-width: 100%;
+    max-height: 65vh;
+    border-radius: 16px;
+    border: 1px solid #1a1a1a;
+}
+
+.overlay-content .overlay-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.overlay-actions {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+}
+
+.overlay-actions button {
+    padding: 12px 28px;
+    border: 1px solid #1a1a1a;
+    border-radius: 12px;
+    background: transparent;
+    color: #888;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+.overlay-actions button:hover {
+    border-color: #333;
+    color: #fff;
+}
+
+.overlay-actions button.primary {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.overlay-actions button.primary:hover {
+    background: rgba(0, 255, 136, 0.05);
+}
+
+.overlay-actions button.danger {
+    border-color: #ff2244;
+    color: #ff2244;
+}
+
+.overlay-actions button.danger:hover {
+    background: rgba(255, 34, 68, 0.05);
+}
+
 /* ===== КНОПКИ В СООБЩЕНИЯХ ===== */
 .cashout-btn {
     width: 100%;
@@ -431,5 +519,18 @@ body {
         max-width: 90%;
         font-size: 13px;
         padding: 10px 14px;
+    }
+    .overlay-content {
+        padding: 16px;
+        max-width: 96%;
+    }
+    .overlay-actions {
+        flex-wrap: wrap;
+    }
+    .overlay-actions button {
+        flex: 1;
+        min-width: 80px;
+        padding: 10px 16px;
+        font-size: 12px;
     }
 }
